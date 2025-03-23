@@ -1,38 +1,102 @@
-* { box-sizing: border-box; }
-body{margin: 0;
-font-family:Helvetica,Arial,sans-serif;
-font-size:  14px;
-line-height: 1.5;
-letter-spacing: 0.5px;
+/* Reset dasar */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
-input,
-select
-{
-width: 100%;
-padding:8px; margin:5px 0;
-border: 1px solid grey;
-border-radius:5px;
-display: block;
+/* Style dasar */
+body {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    letter-spacing: 0.5px;
+    margin: 0;
+    padding: 20px;
 }
 
-button,
-input[type=submit],
-input[type=button]
-{
-color:white; background:skyblue;
-border: 1px solid transparent;
-cursor:pointer;
-align-items: center;
+/* Form styling */
+input, select {
+    width: 100%;
+    padding: 8px;
+    margin: 5px 0;
+    border: 1px solid grey;
+    border-radius: 5px;
+    display: block;
 }
 
-button:hover,input[type=submit]:hover,input[type=button]:hover{background:aqua; }
+button, input[type=submit], input[type=button] {
+    color: white;
+    background: skyblue;
+    border: 1px solid transparent;
+    cursor: pointer;
+    padding: 10px;
+}
 
-ul {margin: 0; padding: 0; list-style-type:none;}
-li {padding: 0; left:0; }
+button:hover, input[type=submit]:hover, input[type=button]:hover {
+    background: aqua;
+}
 
-table {border-collapse:collapse; border-spacing:0; width:100%; color: #000;}
-table th, table td { border:none; text-align:left; padding:8px; }
-table tr { background:#f8f8f8; }
-table tr:nth-child(even){ background:#fff;}
-table th { height:37px; }
+/* List */
+ul {
+    margin: 10px 0;
+    padding-left: 20px;
+    list-style-type: disc;
+}
+
+li {
+    padding: 5px 0;
+}
+
+/* Table */
+table {
+    border-collapse: collapse;
+    width: 100%;
+    color: #000;
+    margin-top: 10px;
+}
+
+table th, table td {
+    border: 1px solid #ccc;
+    text-align: left;
+    padding: 8px;
+}
+
+table tr:nth-child(even) {
+    background: #f8f8f8;
+}
+
+table th {
+    background: #e0e0e0;
+    font-weight: bold;
+}
+
+/* Header */
+header {
+    background: #0073e6;
+    padding: 15px;
+    text-align: center;
+}
+
+header a {
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+}
+
+/* Footer */
+footer {
+    margin-top: 20px;
+    text-align: center;
+    padding: 10px;
+    background: #222;
+    color: white;
+}
+
+/* Padding dan margin tambahan */
+section {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #f9f9f9;
+    border-radius: 8px;
+}
