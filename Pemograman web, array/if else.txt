@@ -1,0 +1,50 @@
+<?php
+$nilai = 80;
+// Menggunakan if-else
+if ($nilai >= 85) {
+    echo "Grade: A";
+} elseif ($nilai >= 70) {
+    echo "Grade: B";
+} else {
+    echo "Grade: C";
+}
+
+// Menggunakan switch
+$hari = "Senin";
+switch ($hari) {
+    case "Senin":
+        echo "<br>Hari ini adalah awal minggu.";
+        break;
+    case "Jumat":
+        echo "<br>Hari ini adalah akhir kerja.";
+        break;
+    default:
+        echo "<br>Hari biasa.";
+        break;
+}
+
+// 🔥 TAMBAHAN CONTOH BARU: if-else dengan status login
+$isLogin = true;
+if ($isLogin) {
+    echo "<br>Selamat datang, user!";
+} else {
+    echo "<br>Silakan login terlebih dahulu.";
+}
+
+// 🔥 TAMBAHAN CONTOH BARU: switch untuk menentukan jenis kendaraan
+$kendaraan = "Motor";
+switch ($kendaraan) {
+    case "Mobil":
+        echo "<br>Kendaraan roda empat.";
+        break;
+    case "Motor":
+        echo "<br>Kendaraan roda dua.";
+        break;
+    case "Sepeda":
+        echo "<br>Kendaraan tanpa mesin.";
+        break;
+    default:
+        echo "<br>Jenis kendaraan tidak dikenal.";
+        break;
+}
+?>

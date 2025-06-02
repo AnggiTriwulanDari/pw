@@ -1,0 +1,29 @@
+<?php
+// Array indeks
+$buah = ["Apel", "Jeruk", "Mangga"];
+echo "Buah favorit: " . $buah[1] . "<br>"; // Output: Jeruk
+
+// Array asosiatif
+$mahasiswa = [
+    "nama" => "Andi",
+    "nim" => "123456",
+    "jurusan" => "Informatika"
+];
+echo "Nama Mahasiswa: " . $mahasiswa["nama"] . "<br>";
+
+// 🔥 TAMBAHAN CONTOH BARU: Array indeks dengan perulangan
+$warna = ["Merah", "Hijau", "Biru"];
+foreach ($warna as $w) {
+    echo "Warna: $w<br>";
+}
+
+// 🔥 TAMBAHAN CONTOH BARU: Array asosiatif dengan data buku
+$buku = [
+    "judul" => "Belajar PHP",
+    "penulis" => "Budi Santoso",
+    "tahun" => 2024
+];
+echo "Judul Buku: " . $buku["judul"] . "<br>";
+echo "Penulis: " . $buku["penulis"] . "<br>";
+echo "Tahun Terbit: " . $buku["tahun"] . "<br>";
+?>
