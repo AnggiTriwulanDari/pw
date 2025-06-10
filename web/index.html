@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Wawan Sismadi</title>
+  <title>Anggi Triwulan Dari</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -15,10 +15,10 @@
   </div>
 
   <div class="header-text">
-    <h1>Wawan Sismadi</h1>
+    <h1>Anggi Triwulan Dari</h1>
     <p class="subtitle">He/Him • Web Developer</p>
     <p>Jakarta, Indonesia • <a href="https://wawan.sismadi.com">wawan.sismadi.com</a></p>
-    <p><strong>Sismadi Langit Solusi</strong> — Universitas Ahmad Dahlan</p>
+    <p><strong>Sismadi Langit Solusi</strong> — Universitas Ipwija</p>
   </div>
 
   <div class="action-buttons">
@@ -48,11 +48,8 @@
 // Import Supabase client dari CDN
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-
-const SUPABASE_URL = 'https://zligkbkrxqqbetnwykrq.supabase.co'
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpsaWdrYmtyeHFxYmV0bnd5a3JxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkyNjM2ODUsImV4cCI6MjA2NDgzOTY4NX0.kDK8_c6qCKKRax4HbHwEbAMwTavhDRWdgqkDtjWWYD8'
-
-
+const SUPABASE_URL = 'https://jerzpdsqalkfidyilach.supabase.co'
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImplcnpwZHNxYWxrZmlkeWlsYWNoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk1Mjc5MjQsImV4cCI6MjA2NTEwMzkyNH0.gdz2lDnyCT43mGnp_qqAr86YKifq_I9Y7NACnev_vaQ'
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
 // Elemen DOM
@@ -77,29 +74,19 @@ async function loadData() {
   content.innerHTML = ''
   let  out=``;
   data.forEach(row => {
-
     out+=`
-
     <div class="content-card">
     <h2>${row.judul}</h2>
     <p>${row.isi}
 </p>
-
   </div>
   `
-
   })
   content.innerHTML = out
-
-
 }
-
  // Load data saat halaman siap
 window.addEventListener('DOMContentLoaded', loadData)
-
 </script>
-
-
 
 </body>
 </html>
