@@ -16,13 +16,12 @@
 
   <div class="header-text">
     <h1>Anggi Triwulan Dari</h1>
-    <p class="subtitle">He/Him • Web Developer</p>
+    <p class="subtitle">He/Him • Mahasiswa</p>
     <p>Jakarta, Indonesia • <a href="https://anggi.triwulan.com">anggi.triwulan.com</a></p>
     <p><strong>Langit Cerah</strong> — Universitas IPWIJA</p>
   </div>
 
   <div class="action-buttons">
-
 
     <button id="loginBtn">Login untuk akses data</button>
 <button id="logoutBtn">Logout</button>
@@ -80,9 +79,6 @@ async function loadData() {
     return
   }
 
-
-
-
   const { data, error } = await supabase
     .from('web3')
     .select('*')
@@ -104,13 +100,10 @@ async function loadData() {
   })
 
   content.innerHTML = out
-
 }
-
 
 document.getElementById('loginBtn').addEventListener('click', login)
 document.getElementById('logoutBtn').addEventListener('click', logout)
-
 
 window.addEventListener('DOMContentLoaded', async () => {
   const { data: { user } } = await supabase.auth.getUser()
