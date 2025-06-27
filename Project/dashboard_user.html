@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard User</title>
+  <style>
+    body {
+      font-family: Arial;
+      padding: 40px;
+      max-width: 600px;
+      margin: auto;
+      background-color: #f8f8f8;
+    }
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Selamat Datang, User!</h2>
+    <p>Ini adalah dashboard khusus pengguna biasa.</p>
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <script>
+    const session = localStorage.getItem('sessionUser');
+    if (session !== 'user') {
+      alert("Akses hanya untuk user!");
+      location.href = 'index.html';
+    }
+
+    function logout() {
+      localStorage.removeItem('sessionUser');
+      location.href = 'index.html';
+    }
+  </script>
+</body>
+</html>
