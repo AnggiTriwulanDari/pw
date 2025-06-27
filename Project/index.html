@@ -2,69 +2,198 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Login User & Admin</title>
+  <title>Login Sederhana (User & Admin)</title>
   <style>
     body {
       font-family: Arial;
-      padding: 30px;
-      max-width: 400px;
+      padding: 20px;
+      max-width: 600px;
       margin: auto;
     }
-    .form-box {
+    .login-box, .dashboard-box {
       border: 1px solid #ccc;
       padding: 20px;
       border-radius: 8px;
+      margin-top: 20px;
     }
     input {
       width: 100%;
       padding: 8px;
-      margin: 5px 0 15px;
+      margin-top: 5px;
+      margin-bottom: 15px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      border: 1px solid #aaa;
+      padding: 8px;
+      text-align: left;
     }
     button {
-      width: 100%;
-      padding: 10px;
+      margin-top: 10px;
+      padding: 8px 12px;
     }
   </style>
 </head>
 <body>
 
-<h2>Login Sistem Inventaris</h2>
+<h2>Login Sistem</h2>
 
-<div class="form-box">
+<div class="login-box" id="loginBox">
   <form id="loginForm">
-    <label>Username:</label>
-    <input type="text" id="username" required>
-    
-    <label>Password:</label>
-    <input type="password" id="password" required>
-
+    <label>Username:
+      <input type="text" id="username" required>
+    </label>
+    <label>Password:
+      <input type="password" id="password" required>
+    </label>
     <button type="submit">Login</button>
   </form>
 </div>
 
+<!-- Tampilan User -->
+<div class="login-box" id="userBox" style="display: none;">
+  <h3>Halo, User!</h3>
+  <p>Selamat datang di sistem. Akses terbatas.</p>
+  <button onclick="logout()">Logout</button>
+</div>
+
+<!-- Tampilan Admin -->
+<div class="dashboard-box" id="adminBox" style="display: none;">
+  <h3>Dashboard Admin - Inventaris</h3>
+
+  <form id="itemForm">
+    <input type="hidden" id="editIndex">
+    <label>Nama Barang:</label>
+    <input type="text" id="itemName" required>
+    <label>Jumlah:</label>
+    <input type="number" id="itemQty" required>
+    <button type="submit">Simpan</button>
+    <button type="button" onclick="resetForm()">Batal</button>
+  </form>
+
+  <table id="itemTable">
+    <thead>
+      <tr>
+        <th>No</th>
+        <th>Nama Barang</th>
+        <th>Jumlah</th>
+        <th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <button onclick="logout()">Logout</button>
+</div>
+
 <script>
   const users = {
-    admin: 'admin123',
-    user: 'user123'
+    admin: '12345',
+    user: 'pass'
   };
+
+  function checkLogin() {
+    const session = localStorage.getItem('sessionUser');
+    if (session === 'admin') {
+      document.getElementById('loginBox').style.display = 'none';
+      document.getElementById('adminBox').style.display = 'block';
+      loadItems();
+    } else if (session === 'user') {
+      document.getElementById('loginBox').style.display = 'none';
+      document.getElementById('userBox').style.display = 'block';
+    }
+  }
 
   document.getElementById('loginForm').addEventListener('submit', function(e) {
     e.preventDefault();
-
     const uname = document.getElementById('username').value.trim();
     const pass = document.getElementById('password').value.trim();
 
     if (users[uname] && users[uname] === pass) {
       localStorage.setItem('sessionUser', uname);
-      if (uname === 'admin') {
-        window.location.href = 'dashboard_admin.html';
-      } else {
-        window.location.href = 'dashboard_user.html';
-      }
+      checkLogin();
     } else {
       alert('Username atau password salah!');
     }
   });
+
+  function logout() {
+    localStorage.removeItem('sessionUser');
+    location.reload();
+  }
+
+  // ADMIN: Inventaris
+  const itemForm = document.getElementById('itemForm');
+  const itemName = document.getElementById('itemName');
+  const itemQty = document.getElementById('itemQty');
+  const editIndex = document.getElementById('editIndex');
+  const itemTableBody = document.querySelector('#itemTable tbody');
+
+  itemForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const items = JSON.parse(localStorage.getItem('items')) || [];
+
+    const newItem = {
+      name: itemName.value.trim(),
+      qty: parseInt(itemQty.value)
+    };
+
+    if (editIndex.value === "") {
+      items.push(newItem);
+    } else {
+      items[parseInt(editIndex.value)] = newItem;
+    }
+
+    localStorage.setItem('items', JSON.stringify(items));
+    loadItems();
+    resetForm();
+  });
+
+  function loadItems() {
+    const items = JSON.parse(localStorage.getItem('items')) || [];
+    itemTableBody.innerHTML = "";
+    items.forEach((item, index) => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${index + 1}</td>
+        <td>${item.name}</td>
+        <td>${item.qty}</td>
+        <td>
+          <button onclick="editItem(${index})">Edit</button>
+          <button onclick="deleteItem(${index})">Hapus</button>
+        </td>
+      `;
+      itemTableBody.appendChild(row);
+    });
+  }
+
+  function editItem(index) {
+    const items = JSON.parse(localStorage.getItem('items')) || [];
+    const item = items[index];
+    itemName.value = item.name;
+    itemQty.value = item.qty;
+    editIndex.value = index;
+  }
+
+  function deleteItem(index) {
+    if (confirm("Hapus barang ini?")) {
+      const items = JSON.parse(localStorage.getItem('items')) || [];
+      items.splice(index, 1);
+      localStorage.setItem('items', JSON.stringify(items));
+      loadItems();
+    }
+  }
+
+  function resetForm() {
+    itemForm.reset();
+    editIndex.value = "";
+  }
+
+  checkLogin();
 </script>
 
 </body>
