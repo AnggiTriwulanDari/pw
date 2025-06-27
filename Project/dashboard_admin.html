@@ -11,11 +11,10 @@
   <form id="addForm">
     <input type="text" id="itemName" placeholder="Nama Barang" required />
     <input type="number" id="itemQty" placeholder="Jumlah" required />
-    <button type="submit">Tambah Barang</button>
+    <button type="submit">Tambah</button>
   </form>
 
   <br />
-
   <table border="1" id="itemTable">
     <thead>
       <tr>
@@ -31,37 +30,63 @@
   <button onclick="logout()">Logout</button>
 
   <script>
-    const supabase = supabase.createClient(
-      'https://oluiadcgamtarvxglwvi.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9sdWlhZGNnYW10YXJ2eGdsd3ZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA5OTc5MDMsImV4cCI6MjA2NjU3MzkwM30.0wAayKThZxfboiKmidQskSRBMmqGJus5wJ1BrxUsPQU'
-    );
+    let supabase;
 
-    const role = localStorage.getItem('sessionRole');
-    if (role !== 'admin') window.location.href = 'index.html';
+    // Tunggu sampai semua konten termuat
+    window.addEventListener('DOMContentLoaded', () => {
+      supabase = window.supabase.createClient(
+        'https://oluiadcgamtarvxglwvi.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9sdWlhZGNnYW10YXJ2eGdsd3ZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA5OTc5MDMsImV4cCI6MjA2NjU3MzkwM30.0wAayKThZxfboiKmidQskSRBMmqGJus5wJ1BrxUsPQU'
+      );
+
+      const role = localStorage.getItem('sessionRole');
+      if (role !== 'admin') {
+        window.location.href = 'index.html';
+        return;
+      }
+
+      loadItems();
+
+      document.getElementById('addForm').addEventListener('submit', addItem);
+    });
 
     async function loadItems() {
       const { data, error } = await supabase.from('items').select('*');
       const tbody = document.querySelector('#itemTable tbody');
       tbody.innerHTML = '';
-      data.forEach((item, i) => {
-        tbody.innerHTML += `
-          <tr>
-            <td>${i + 1}</td>
-            <td>${item.name}</td>
-            <td>${item.qty}</td>
-          </tr>`;
-      });
+
+      if (error) {
+        console.error('Gagal ambil data:', error);
+        tbody.innerHTML = '<tr><td colspan="3">Gagal memuat data.</td></tr>';
+        return;
+      }
+
+      if (data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3">Tidak ada data.</td></tr>';
+      } else {
+        data.forEach((item, i) => {
+          tbody.innerHTML += `
+            <tr>
+              <td>${i + 1}</td>
+              <td>${item.name}</td>
+              <td>${item.qty}</td>
+            </tr>`;
+        });
+      }
     }
 
     async function addItem(e) {
       e.preventDefault();
-      const name = document.getElementById('itemName').value;
-      const qty = parseInt(document.getElementById('itemQty').value);
+      const name = document.getElementById('itemName').value.trim();
+      const qty = parseInt(document.getElementById('itemQty').value.trim());
+
+      if (!name || isNaN(qty)) return alert('Input tidak valid');
 
       const { error } = await supabase.from('items').insert([{ name, qty }]);
 
       if (error) {
-        alert('Gagal menambahkan barang!');
+        alert('Gagal menambahkan data');
+        console.error(error);
       } else {
         document.getElementById('addForm').reset();
         loadItems();
@@ -72,9 +97,6 @@
       localStorage.clear();
       window.location.href = 'index.html';
     }
-
-    document.getElementById('addForm').addEventListener('submit', addItem);
-    loadItems();
   </script>
 </body>
 </html>
