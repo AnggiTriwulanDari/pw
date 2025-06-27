@@ -1,49 +1,14 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Dashboard User</title>
-  <style>
-    body {
-      font-family: Arial;
-      padding: 40px;
-      max-width: 600px;
-      margin: auto;
-      background-color: #f8f8f8;
-    }
-    .card {
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      margin-bottom: 30px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-    }
-    th, td {
-      border: 1px solid #aaa;
-      padding: 8px;
-      text-align: left;
-    }
-    button {
-      margin-top: 20px;
-      padding: 10px 20px;
-    }
-  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
 <body>
+  <h2>Dashboard User</h2>
 
-<div class="card">
-  <h2>Selamat Datang, User!</h2>
-  <p>Berikut adalah daftar barang yang tersedia:</p>
-</div>
-
-<div class="card">
-  <h3>Inventaris Barang</h3>
-  <table id="itemTable">
+  <table border="1" id="itemTable">
     <thead>
       <tr>
         <th>No</th>
@@ -53,45 +18,39 @@
     </thead>
     <tbody></tbody>
   </table>
-</div>
 
-<div class="card" style="text-align: center;">
+  <br />
   <button onclick="logout()">Logout</button>
-</div>
 
-<script>
-  // Pastikan hanya user yang bisa akses
-  const session = localStorage.getItem('sessionUser');
-  if (session !== 'user') {
-    alert("Akses hanya untuk user!");
-    location.href = 'index.html';
-  }
+  <script>
+    const supabase = supabase.createClient(
+      'https://YOUR_PROJECT_URL.supabase.co',
+      'YOUR_ANON_KEY'
+    );
 
-  // Fungsi logout
-  function logout() {
-    localStorage.removeItem('sessionUser');
-    location.href = 'index.html';
-  }
+    const role = localStorage.getItem('sessionRole');
+    if (role !== 'user') window.location.href = 'index.html';
 
-  // Tampilkan barang dari localStorage
-  function loadItems() {
-    const items = JSON.parse(localStorage.getItem('items')) || [];
-    const tbody = document.querySelector("#itemTable tbody");
-    tbody.innerHTML = "";
+    async function loadItems() {
+      const { data, error } = await supabase.from('items').select('*');
+      const tbody = document.querySelector('#itemTable tbody');
+      tbody.innerHTML = '';
+      data.forEach((item, i) => {
+        tbody.innerHTML += `
+          <tr>
+            <td>${i + 1}</td>
+            <td>${item.name}</td>
+            <td>${item.qty}</td>
+          </tr>`;
+      });
+    }
 
-    items.forEach((item, index) => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${index + 1}</td>
-        <td>${item.name}</td>
-        <td>${item.qty}</td>
-      `;
-      tbody.appendChild(row);
-    });
-  }
+    function logout() {
+      localStorage.clear();
+      window.location.href = 'index.html';
+    }
 
-  loadItems();
-</script>
-
+    loadItems();
+  </script>
 </body>
 </html>
