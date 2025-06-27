@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Anggi Triwulan Dari</title>
+  <title>Aplikasi Inventory</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -41,8 +41,8 @@
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-const SUPABASE_URL = 'https://jerzpdsqalkfidyilach.supabase.co'
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImplcnpwZHNxYWxrZmlkeWlsYWNoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk1Mjc5MjQsImV4cCI6MjA2NTEwMzkyNH0.gdz2lDnyCT43mGnp_qqAr86YKifq_I9Y7NACnev_vaQ'
+const SUPABASE_URL = 'https://oluiadcgamtarvxglwvi.supabase.co'
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9sdWlhZGNnYW10YXJ2eGdsd3ZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA5OTc5MDMsImV4cCI6MjA2NjU3MzkwM30.0wAayKThZxfboiKmidQskSRBMmqGJus5wJ1BrxUsPQU'
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 const content = document.getElementById('content')
@@ -50,8 +50,8 @@ const content = document.getElementById('content')
 // Coba login manual (bisa diganti pakai form)
 async function login() {
   const { data, error } = await supabase.auth.signInWithPassword({
-    email: 'user@example.com', // ganti dengan akun terdaftar
-    password: 'password123'     // ganti sesuai user
+    email: 'user@email.com', // ganti dengan akun terdaftar
+    password: 'user123'     // ganti sesuai user
   })
 
   if (error) {
