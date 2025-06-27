@@ -15,8 +15,18 @@
       background: white;
       padding: 20px;
       border-radius: 8px;
-      text-align: center;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      border: 1px solid #aaa;
+      padding: 8px;
+      text-align: left;
     }
     button {
       margin-top: 20px;
@@ -25,23 +35,63 @@
   </style>
 </head>
 <body>
-  <div class="card">
-    <h2>Selamat Datang, User!</h2>
-    <p>Ini adalah dashboard khusus pengguna biasa.</p>
-    <button onclick="logout()">Logout</button>
-  </div>
 
-  <script>
-    const session = localStorage.getItem('sessionUser');
-    if (session !== 'user') {
-      alert("Akses hanya untuk user!");
-      location.href = 'index.html';
-    }
+<div class="card">
+  <h2>Selamat Datang, User!</h2>
+  <p>Berikut adalah daftar barang yang tersedia:</p>
+</div>
 
-    function logout() {
-      localStorage.removeItem('sessionUser');
-      location.href = 'index.html';
-    }
-  </script>
+<div class="card">
+  <h3>Inventaris Barang</h3>
+  <table id="itemTable">
+    <thead>
+      <tr>
+        <th>No</th>
+        <th>Nama Barang</th>
+        <th>Jumlah</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<div class="card" style="text-align: center;">
+  <button onclick="logout()">Logout</button>
+</div>
+
+<script>
+  // Pastikan hanya user yang bisa akses
+  const session = localStorage.getItem('sessionUser');
+  if (session !== 'user') {
+    alert("Akses hanya untuk user!");
+    location.href = 'index.html';
+  }
+
+  // Fungsi logout
+  function logout() {
+    localStorage.removeItem('sessionUser');
+    location.href = 'index.html';
+  }
+
+  // Tampilkan barang dari localStorage
+  function loadItems() {
+    const items = JSON.parse(localStorage.getItem('items')) || [];
+    const tbody = document.querySelector("#itemTable tbody");
+    tbody.innerHTML = "";
+
+    items.forEach((item, index) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${index + 1}</td>
+        <td>${item.name}</td>
+        <td>${item.qty}</td>
+      `;
+      tbody.appendChild(row);
+    });
+  }
+
+  loadItems();
+</script>
+
 </body>
 </html>
