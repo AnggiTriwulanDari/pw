@@ -43,6 +43,7 @@
       display: none;
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
 <body>
 
@@ -82,13 +83,11 @@
 </div>
 
 <script>
-  const users = {
-    user: 'user123'
-  };
-
-  const admins = {
-    admin: 'admin123'
-  };
+  // Ganti ini dengan milikmu
+  const supabase = supabase.createClient(
+    'https://YOUR_PROJECT_URL.supabase.co',
+    'YOUR_ANON_KEY'
+  );
 
   function showForm(role) {
     document.getElementById('userForm').style.display = 'none';
@@ -101,34 +100,50 @@
     }
   }
 
-  function loginUser(e) {
+  async function loginUser(e) {
     e.preventDefault();
     const uname = document.getElementById('userUsername').value.trim();
     const pass = document.getElementById('userPassword').value.trim();
 
-    if (users[uname] && users[uname] === pass) {
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('username', uname)
+      .eq('password', pass)
+      .eq('role', 'user')
+      .single();
+
+    if (error || !data) {
+      alert('Login user gagal!');
+    } else {
       alert('Login user berhasil!');
       localStorage.setItem('sessionUser', uname);
+      localStorage.setItem('sessionRole', 'user');
       window.location.href = 'dashboard_user.html';
-    } else {
-      alert('Login user gagal!');
     }
-    return false;
   }
 
-  function loginAdmin(e) {
+  async function loginAdmin(e) {
     e.preventDefault();
     const uname = document.getElementById('adminUsername').value.trim();
     const pass = document.getElementById('adminPassword').value.trim();
 
-    if (admins[uname] && admins[uname] === pass) {
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('username', uname)
+      .eq('password', pass)
+      .eq('role', 'admin')
+      .single();
+
+    if (error || !data) {
+      alert('Login admin gagal!');
+    } else {
       alert('Login admin berhasil!');
       localStorage.setItem('sessionUser', uname);
+      localStorage.setItem('sessionRole', 'admin');
       window.location.href = 'dashboard_admin.html';
-    } else {
-      alert('Login admin gagal!');
     }
-    return false;
   }
 </script>
 
