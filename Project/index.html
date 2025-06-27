@@ -104,7 +104,7 @@
     const pass = document.getElementById('userPassword').value.trim();
 
     const { data, error } = await supabase
-      .from('users')
+      .from('user')
       .select('*')
       .eq('username', uname)
       .eq('password', pass)
@@ -128,7 +128,7 @@
     const pass = document.getElementById('adminPassword').value.trim();
 
     const { data, error } = await supabase
-      .from('users')
+      .from('user')
       .select('*')
       .eq('username', uname)
       .eq('password', pass)
