@@ -134,7 +134,7 @@ async function loadData() {
   }
 
   const { data, error } = await supabase
-    .from('users')
+    .from('items')
     .select('*')
     .order('id')
 
