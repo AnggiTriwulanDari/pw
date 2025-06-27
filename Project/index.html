@@ -43,6 +43,8 @@
       display: none;
     }
   </style>
+
+  <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
 <body>
@@ -58,10 +60,10 @@
 <div id="userForm" class="form-box">
   <h3>Login User</h3>
   <form onsubmit="return loginUser(event)">
-    <label>username:</label>
+    <label>Username:</label>
     <input type="text" id="userUsername" required>
 
-    <label>password:</label>
+    <label>Password:</label>
     <input type="password" id="userPassword" required>
 
     <button type="submit">Login</button>
@@ -72,10 +74,10 @@
 <div id="adminForm" class="form-box">
   <h3>Login Admin</h3>
   <form onsubmit="return loginAdmin(event)">
-    <label>username:</label>
+    <label>Username:</label>
     <input type="text" id="adminUsername" required>
 
-    <label>password:</label>
+    <label>Password:</label>
     <input type="password" id="adminPassword" required>
 
     <button type="submit">Login</button>
@@ -83,68 +85,69 @@
 </div>
 
 <script>
-  // Ganti ini dengan milikmu
-  const supabase = supabase.createClient(
-    'https://oluiadcgamtarvxglwvi.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9sdWlhZGNnYW10YXJ2eGdsd3ZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA5OTc5MDMsImV4cCI6MjA2NjU3MzkwM30.0wAayKThZxfboiKmidQskSRBMmqGJus5wJ1BrxUsPQU'
-  );
+  window.onload = function () {
+    const supabase = supabase.createClient(
+      'https://oluiadcgamtarvxglwvi.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9sdWlhZGNnYW10YXJ2eGdsd3ZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA5OTc5MDMsImV4cCI6MjA2NjU3MzkwM30.0wAayKThZxfboiKmidQskSRBMmqGJus5wJ1BrxUsPQU' 
+    );
 
-  function showForm(role) {
-    document.getElementById('userForm').style.display = 'none';
-    document.getElementById('adminForm').style.display = 'none';
+    window.showForm = function(role) {
+      document.getElementById('userForm').style.display = 'none';
+      document.getElementById('adminForm').style.display = 'none';
 
-    if (role === 'user') {
-      document.getElementById('userForm').style.display = 'block';
-    } else if (role === 'admin') {
-      document.getElementById('adminForm').style.display = 'block';
-    }
-  }
+      if (role === 'user') {
+        document.getElementById('userForm').style.display = 'block';
+      } else if (role === 'admin') {
+        document.getElementById('adminForm').style.display = 'block';
+      }
+    };
 
-  async function loginUser(e) {
-    e.preventDefault();
-    const uname = document.getElementById('userUsername').value.trim();
-    const pass = document.getElementById('userPassword').value.trim();
+    window.loginUser = async function(e) {
+      e.preventDefault();
+      const uname = document.getElementById('userUsername').value.trim();
+      const pass = document.getElementById('userPassword').value.trim();
 
-    const { data, error } = await supabase
-      .from('users')
-      .select('*')
-      .eq('username', uname)
-      .eq('password', pass)
-      .eq('role', 'user')
-      .single();
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('username', uname)
+        .eq('password', pass)
+        .eq('role', 'user')
+        .single();
 
-    if (error || !data) {
-      alert('Login user gagal!');
-    } else {
-      alert('Login user berhasil!');
-      localStorage.setItem('sessionUser', uname);
-      localStorage.setItem('sessionRole', 'user');
-      window.location.href = 'dashboard_user.html';
-    }
-  }
+      if (error || !data) {
+        alert('Login user gagal!');
+      } else {
+        alert('Login user berhasil!');
+        localStorage.setItem('sessionUser', uname);
+        localStorage.setItem('sessionRole', 'user');
+        window.location.href = 'dashboard_user.html';
+      }
+    };
 
-  async function loginAdmin(e) {
-    e.preventDefault();
-    const uname = document.getElementById('adminUsername').value.trim();
-    const pass = document.getElementById('adminPassword').value.trim();
+    window.loginAdmin = async function(e) {
+      e.preventDefault();
+      const uname = document.getElementById('adminUsername').value.trim();
+      const pass = document.getElementById('adminPassword').value.trim();
 
-    const { data, error } = await supabase
-      .from('users')
-      .select('*')
-      .eq('username', uname)
-      .eq('password', pass)
-      .eq('role', 'admin')
-      .single();
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('username', uname)
+        .eq('password', pass)
+        .eq('role', 'admin')
+        .single();
 
-    if (error || !data) {
-      alert('Login admin gagal!');
-    } else {
-      alert('Login admin berhasil!');
-      localStorage.setItem('sessionUser', uname);
-      localStorage.setItem('sessionRole', 'admin');
-      window.location.href = 'dashboard_admin.html';
-    }
-  }
+      if (error || !data) {
+        alert('Login admin gagal!');
+      } else {
+        alert('Login admin berhasil!');
+        localStorage.setItem('sessionUser', uname);
+        localStorage.setItem('sessionRole', 'admin');
+        window.location.href = 'dashboard_admin.html';
+      }
+    };
+  };
 </script>
 
 </body>
