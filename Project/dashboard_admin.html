@@ -1,160 +1,80 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Dashboard Admin</title>
-  <style>
-    body {
-      font-family: Arial;
-      padding: 40px;
-      max-width: 800px;
-      margin: auto;
-      background-color: #f2f2f2;
-    }
-    h2 {
-      text-align: center;
-    }
-    .form-box, .table-box {
-      background: white;
-      padding: 20px;
-      margin-top: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    input {
-      width: 100%;
-      padding: 8px;
-      margin: 8px 0;
-    }
-    table {
-      width: 100%;
-      margin-top: 10px;
-      border-collapse: collapse;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
-    }
-    button {
-      padding: 8px 12px;
-      margin: 5px;
-    }
-  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
 <body>
+  <h2>Dashboard Admin</h2>
 
-<h2>Dashboard Admin - Inventaris Barang</h2>
-
-<div class="form-box">
-  <form id="itemForm">
-    <input type="hidden" id="editIndex">
-    <label>Nama Barang:</label>
-    <input type="text" id="itemName" required>
-    <label>Jumlah:</label>
-    <input type="number" id="itemQty" required>
-    <button type="submit">Simpan</button>
-    <button type="button" onclick="resetForm()">Batal</button>
+  <form id="addForm">
+    <input type="text" id="itemName" placeholder="Nama Barang" required />
+    <input type="number" id="itemQty" placeholder="Jumlah" required />
+    <button type="submit">Tambah Barang</button>
   </form>
-</div>
 
-<div class="table-box">
-  <table id="itemTable">
+  <br />
+
+  <table border="1" id="itemTable">
     <thead>
       <tr>
         <th>No</th>
         <th>Nama Barang</th>
         <th>Jumlah</th>
-        <th>Aksi</th>
       </tr>
     </thead>
     <tbody></tbody>
   </table>
-</div>
 
-<div style="text-align: center; margin-top: 30px;">
+  <br />
   <button onclick="logout()">Logout</button>
-</div>
 
-<script>
-  const session = localStorage.getItem('sessionUser');
-  if (session !== 'admin') {
-    alert("Akses hanya untuk admin!");
-    location.href = 'index.html';
-  }
+  <script>
+    const supabase = supabase.createClient(
+      'https://YOUR_PROJECT_URL.supabase.co',
+      'YOUR_ANON_KEY'
+    );
 
-  const itemForm = document.getElementById('itemForm');
-  const itemName = document.getElementById('itemName');
-  const itemQty = document.getElementById('itemQty');
-  const editIndex = document.getElementById('editIndex');
-  const itemTableBody = document.querySelector('#itemTable tbody');
+    const role = localStorage.getItem('sessionRole');
+    if (role !== 'admin') window.location.href = 'index.html';
 
-  itemForm.addEventListener('submit', function(e) {
-    e.preventDefault();
-    const items = JSON.parse(localStorage.getItem('items')) || [];
-
-    const newItem = {
-      name: itemName.value.trim(),
-      qty: parseInt(itemQty.value)
-    };
-
-    if (editIndex.value === "") {
-      items.push(newItem);
-    } else {
-      items[parseInt(editIndex.value)] = newItem;
+    async function loadItems() {
+      const { data, error } = await supabase.from('items').select('*');
+      const tbody = document.querySelector('#itemTable tbody');
+      tbody.innerHTML = '';
+      data.forEach((item, i) => {
+        tbody.innerHTML += `
+          <tr>
+            <td>${i + 1}</td>
+            <td>${item.name}</td>
+            <td>${item.qty}</td>
+          </tr>`;
+      });
     }
 
-    localStorage.setItem('items', JSON.stringify(items));
+    async function addItem(e) {
+      e.preventDefault();
+      const name = document.getElementById('itemName').value;
+      const qty = parseInt(document.getElementById('itemQty').value);
+
+      const { error } = await supabase.from('items').insert([{ name, qty }]);
+
+      if (error) {
+        alert('Gagal menambahkan barang!');
+      } else {
+        document.getElementById('addForm').reset();
+        loadItems();
+      }
+    }
+
+    function logout() {
+      localStorage.clear();
+      window.location.href = 'index.html';
+    }
+
+    document.getElementById('addForm').addEventListener('submit', addItem);
     loadItems();
-    resetForm();
-  });
-
-  function loadItems() {
-    const items = JSON.parse(localStorage.getItem('items')) || [];
-    itemTableBody.innerHTML = "";
-    items.forEach((item, index) => {
-      const row = document.createElement('tr');
-      row.innerHTML = `
-        <td>${index + 1}</td>
-        <td>${item.name}</td>
-        <td>${item.qty}</td>
-        <td>
-          <button onclick="editItem(${index})">Edit</button>
-          <button onclick="deleteItem(${index})">Hapus</button>
-        </td>
-      `;
-      itemTableBody.appendChild(row);
-    });
-  }
-
-  function editItem(index) {
-    const items = JSON.parse(localStorage.getItem('items')) || [];
-    const item = items[index];
-    itemName.value = item.name;
-    itemQty.value = item.qty;
-    editIndex.value = index;
-  }
-
-  function deleteItem(index) {
-    if (confirm("Yakin ingin menghapus?")) {
-      const items = JSON.parse(localStorage.getItem('items')) || [];
-      items.splice(index, 1);
-      localStorage.setItem('items', JSON.stringify(items));
-      loadItems();
-    }
-  }
-
-  function resetForm() {
-    itemForm.reset();
-    editIndex.value = "";
-  }
-
-  function logout() {
-    localStorage.removeItem('sessionUser');
-    location.href = 'index.html';
-  }
-
-  loadItems();
-</script>
-
+  </script>
 </body>
 </html>
