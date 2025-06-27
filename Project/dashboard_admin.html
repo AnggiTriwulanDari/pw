@@ -15,10 +15,14 @@
       color: #333;
     }
 
+    .button-container {
+      margin-top: 30px;
+    }
+
     button {
-      padding: 10px 20px;
-      font-size: 15px;
-      margin: 5px;
+      padding: 12px 25px;
+      font-size: 16px;
+      margin: 10px 5px;
       cursor: pointer;
       background-color: #87CEEB;
       border: none;
@@ -52,32 +56,28 @@
       border-radius: 4px;
     }
 
-    .button-group {
-      text-align: center;
-      margin-top: 10px;
-    }
-
     table {
       margin-top: 30px;
-      width: 80%;
+      width: 100%;
+      max-width: 600px;
       margin-left: auto;
       margin-right: auto;
       border-collapse: collapse;
     }
 
-    table, th, td {
-      border: 1px solid #aaa;
-    }
-
     th, td {
       padding: 10px;
-      cursor: pointer;
+      border: 1px solid #ccc;
     }
 
     tr:hover {
-      background-color: #e0f7ff;
+      background-color: #e6f7ff;
+      cursor: pointer;
     }
 
+    .button-group {
+      text-align: center;
+    }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
@@ -89,11 +89,10 @@
     <form id="itemForm">
       <input type="text" id="itemName" placeholder="Nama Barang" required />
       <input type="number" id="itemQty" placeholder="Jumlah" required />
-
       <div class="button-group">
         <button type="submit">Simpan</button>
-        <button type="button" onclick="updateItem()" id="editBtn" style="display:none;">Edit</button>
-        <button type="button" onclick="deleteItem()" id="deleteBtn" style="display:none;">Hapus</button>
+        <button type="button" onclick="updateItem()">Edit</button>
+        <button type="button" onclick="deleteItem()">Hapus</button>
       </div>
     </form>
   </div>
@@ -129,6 +128,7 @@
       }
 
       loadItems();
+
       document.getElementById('itemForm').addEventListener('submit', addItem);
     });
 
@@ -147,14 +147,12 @@
         tbody.innerHTML = '<tr><td colspan="3">Tidak ada data.</td></tr>';
       } else {
         data.forEach((item, i) => {
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${i + 1}</td>
-            <td>${item.name}</td>
-            <td>${item.qty}</td>
-          `;
-          row.onclick = () => selectItem(item.id, item.name, item.qty);
-          tbody.appendChild(row);
+          tbody.innerHTML += `
+            <tr onclick="selectItem(${item.id}, '${item.name}', ${item.qty})">
+              <td>${i + 1}</td>
+              <td>${item.name}</td>
+              <td>${item.qty}</td>
+            </tr>`;
         });
       }
     }
@@ -163,60 +161,66 @@
       selectedId = id;
       document.getElementById('itemName').value = name;
       document.getElementById('itemQty').value = qty;
-      document.getElementById('editBtn').style.display = 'inline-block';
-      document.getElementById('deleteBtn').style.display = 'inline-block';
     }
 
     async function addItem(e) {
       e.preventDefault();
       const name = document.getElementById('itemName').value.trim();
       const qty = parseInt(document.getElementById('itemQty').value.trim());
+
       if (!name || isNaN(qty)) return alert('Input tidak valid');
 
       const { error } = await supabase.from('items').insert([{ name, qty }]);
+
       if (error) {
         alert('Gagal menambahkan data');
         console.error(error);
       } else {
-        document.getElementById('itemForm').reset();
+        resetForm();
         loadItems();
       }
     }
 
     async function updateItem() {
-      if (!selectedId) return alert('Pilih barang dulu!');
+      if (!selectedId) return alert('Klik baris dulu buat edit.');
       const name = document.getElementById('itemName').value.trim();
       const qty = parseInt(document.getElementById('itemQty').value.trim());
+
       const { error } = await supabase
         .from('items')
         .update({ name, qty })
         .eq('id', selectedId);
+
       if (error) {
         alert('Gagal update data');
         console.error(error);
       } else {
-        selectedId = null;
-        document.getElementById('itemForm').reset();
-        document.getElementById('editBtn').style.display = 'none';
-        document.getElementById('deleteBtn').style.display = 'none';
+        resetForm();
         loadItems();
       }
     }
 
     async function deleteItem() {
-      if (!selectedId) return alert('Pilih barang dulu!');
-      if (!confirm('Yakin ingin menghapus barang ini?')) return;
-      const { error } = await supabase.from('items').delete().eq('id', selectedId);
+      if (!selectedId) return alert('Klik baris dulu buat hapus.');
+      if (!confirm('Yakin mau hapus barang ini?')) return;
+
+      const { error } = await supabase
+        .from('items')
+        .delete()
+        .eq('id', selectedId);
+
       if (error) {
-        alert('Gagal menghapus data');
+        alert('Gagal hapus data');
         console.error(error);
       } else {
-        selectedId = null;
-        document.getElementById('itemForm').reset();
-        document.getElementById('editBtn').style.display = 'none';
-        document.getElementById('deleteBtn').style.display = 'none';
+        resetForm();
         loadItems();
       }
+    }
+
+    function resetForm() {
+      selectedId = null;
+      document.getElementById('itemForm').reset();
     }
 
     function logout() {
