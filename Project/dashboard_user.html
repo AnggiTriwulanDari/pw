@@ -5,9 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard User</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       font-family: Arial, sans-serif;
@@ -17,31 +15,22 @@
     }
 
     h2 {
+      text-align: center;
       color: #333;
-      text-align: center;
-      font-size: 24px;
     }
 
-    .button-container {
+    .search-container {
       text-align: center;
-      margin-top: 30px;
+      margin-top: 20px;
     }
 
-    button {
-      padding: 12px 20px;
-      font-size: 16px;
-      margin: 20px auto 0;
-      cursor: pointer;
-      background-color: #87CEEB;
-      border: none;
+    .search-container input {
+      padding: 10px;
+      width: 80%;
+      max-width: 400px;
+      border: 1px solid #ccc;
       border-radius: 5px;
-      color: white;
-      transition: background-color 0.3s;
-      display: block;
-    }
-
-    button:hover {
-      background-color: #00bfff;
+      font-size: 16px;
     }
 
     .table-container {
@@ -53,13 +42,13 @@
       width: 100%;
       border-collapse: collapse;
       background-color: #fff;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
       min-width: 300px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     }
 
     th, td {
       border: 1px solid #ccc;
-      padding: 12px;
+      padding: 10px;
       text-align: center;
       font-size: 14px;
     }
@@ -69,19 +58,81 @@
       color: white;
     }
 
-    tr:hover {
-      background-color: #f1f1f1;
+    .buy-btn {
+      background-color: #32CD32;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
       cursor: pointer;
     }
 
-    @media (max-width: 480px) {
-      h2 {
-        font-size: 20px;
-      }
+    .buy-btn:hover {
+      background-color: #2aab2a;
+    }
 
+    .button-container {
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    button {
+      padding: 12px 20px;
+      font-size: 16px;
+      margin-top: 10px;
+      cursor: pointer;
+      background-color: #87CEEB;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background-color: #00bfff;
+    }
+
+    .cart-summary {
+      margin-top: 30px;
+      text-align: center;
+    }
+
+    .cart-summary ul {
+      list-style: none;
+      padding: 0;
+      margin-bottom: 10px;
+    }
+
+    .cart-summary li {
+      margin: 5px 0;
+    }
+
+    .payment-methods {
+      display: none;
+      text-align: center;
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    .payment-methods li {
+      padding: 10px;
+      margin: 5px;
+      background: #e0f7ff;
+      border: 1px solid #87CEEB;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .payment-methods li:hover {
+      background-color: #c0ebff;
+    }
+
+    @media (max-width: 480px) {
       th, td {
         font-size: 12px;
-        padding: 10px;
       }
 
       button {
@@ -95,25 +146,58 @@
 
   <h2>Dashboard User</h2>
 
+  <!-- Search -->
+  <div class="search-container">
+    <input type="text" id="searchInput" placeholder="Cari nama barang..." oninput="filterItems()" />
+  </div>
+
+  <!-- Table -->
   <div class="table-container">
     <table id="itemTable">
       <thead>
         <tr>
           <th>No</th>
-          <th>Nama Barang</th>
+          <th>Nama</th>
           <th>Jumlah</th>
+          <th>Harga</th>
+          <th>Aksi</th>
         </tr>
       </thead>
       <tbody>
-        <tr><td colspan="3">Memuat data...</td></tr>
+        <tr><td colspan="5">Memuat data...</td></tr>
       </tbody>
     </table>
   </div>
 
-  <button onclick="logout()">Logout</button>
+  <!-- Cart Summary -->
+  <div class="cart-summary" id="cartSummary" style="display:none;">
+    <h3>Struk Belanja</h3>
+    <ul id="cartList"></ul>
+    <p><strong>Total: Rp <span id="totalAmount">0</span></strong></p>
+  </div>
+
+  <!-- Payment Methods -->
+  <div class="payment-methods" id="paymentMethods">
+    <h3>Metode Pembayaran</h3>
+    <ul>
+      <li onclick="alert('Transfer Bank dipilih')">Transfer Bank</li>
+      <li onclick="alert('Dana dipilih')">Dana</li>
+      <li onclick="alert('OVO dipilih')">OVO</li>
+      <li onclick="alert('COD dipilih')">Bayar di Tempat</li>
+    </ul>
+  </div>
+
+  <!-- Buttons -->
+  <div class="button-container">
+    <button onclick="showPayment()">Lanjut ke Pembayaran</button>
+    <button onclick="logout()">Logout</button>
+  </div>
 
   <script>
     let supabase;
+    let items = [];
+    let cart = [];
+
     window.addEventListener('DOMContentLoaded', () => {
       supabase = window.supabase.createClient(
         'https://oluiadcgamtarvxglwvi.supabase.co',
@@ -121,10 +205,7 @@
       );
 
       const role = localStorage.getItem('sessionRole');
-      if (role !== 'user') {
-        window.location.href = 'index.html';
-        return;
-      }
+      if (role !== 'user') window.location.href = 'index.html';
 
       loadItems();
     });
@@ -136,22 +217,59 @@
 
       if (error) {
         console.error('Gagal ambil data:', error);
-        tbody.innerHTML = '<tr><td colspan="3">Gagal memuat data.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5">Gagal memuat data.</td></tr>';
         return;
       }
 
-      if (data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="3">Tidak ada data.</td></tr>';
-      } else {
-        data.forEach((item, i) => {
-          tbody.innerHTML += `
-            <tr>
-              <td>${i + 1}</td>
-              <td>${item.name}</td>
-              <td>${item.qty}</td>
-            </tr>`;
-        });
-      }
+      items = data;
+      renderItems(data);
+    }
+
+    function renderItems(data) {
+      const tbody = document.querySelector('#itemTable tbody');
+      tbody.innerHTML = '';
+      data.forEach((item, i) => {
+        tbody.innerHTML += `
+          <tr>
+            <td>${i + 1}</td>
+            <td>${item.name}</td>
+            <td>${item.qty}</td>
+            <td>Rp ${item.price}</td>
+            <td><button class="buy-btn" onclick="addToCart('${item.name}', ${item.price})">Beli</button></td>
+          </tr>`;
+      });
+    }
+
+    function addToCart(name, price) {
+      cart.push({ name, price });
+      updateCart();
+    }
+
+    function updateCart() {
+      const list = document.getElementById('cartList');
+      const total = document.getElementById('totalAmount');
+      const cartDiv = document.getElementById('cartSummary');
+
+      list.innerHTML = '';
+      let totalPrice = 0;
+
+      cart.forEach((item, i) => {
+        totalPrice += item.price;
+        list.innerHTML += `<li>${i + 1}. ${item.name} - Rp ${item.price}</li>`;
+      });
+
+      total.textContent = totalPrice;
+      cartDiv.style.display = cart.length > 0 ? 'block' : 'none';
+    }
+
+    function filterItems() {
+      const keyword = document.getElementById('searchInput').value.toLowerCase();
+      const filtered = items.filter(item => item.name.toLowerCase().includes(keyword));
+      renderItems(filtered);
+    }
+
+    function showPayment() {
+      document.getElementById('paymentMethods').style.display = 'block';
     }
 
     function logout() {
