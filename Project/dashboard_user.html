@@ -5,8 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard User</title>
   <style>
-    * { box-sizing: border-box; }
-
     body {
       font-family: Arial, sans-serif;
       margin: 0;
@@ -15,39 +13,27 @@
     }
 
     h2 {
-      color: #333;
       text-align: center;
-      font-size: 24px;
     }
 
-    input[type="text"] {
-      padding: 10px;
+    #searchInput {
       width: 100%;
-      max-width: 300px;
-      margin: 10px auto;
-      display: block;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-
-    .table-container {
-      overflow-x: auto;
-      margin-top: 20px;
+      padding: 10px;
+      margin-bottom: 10px;
+      box-sizing: border-box;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      background-color: #fff;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-      min-width: 300px;
+      background: #fff;
+      margin-top: 10px;
     }
 
     th, td {
+      padding: 10px;
       border: 1px solid #ccc;
-      padding: 12px;
       text-align: center;
-      font-size: 14px;
     }
 
     th {
@@ -55,67 +41,41 @@
       color: white;
     }
 
-    tr:hover {
-      background-color: #f1f1f1;
-      cursor: pointer;
-    }
-
     button {
+      margin-top: 20px;
       padding: 10px 20px;
-      font-size: 16px;
-      margin: 10px auto;
-      cursor: pointer;
-      background-color: #87CEEB;
+      background: #87CEEB;
       border: none;
-      border-radius: 5px;
       color: white;
-      transition: background-color 0.3s;
-      display: block;
+      cursor: pointer;
+      border-radius: 5px;
+      font-size: 16px;
     }
 
     button:hover {
-      background-color: #00bfff;
+      background: #00bfff;
     }
 
-    #cartSummary {
-      background-color: #fff;
-      padding: 15px;
+    #paymentSection, #receipt {
       margin-top: 20px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      max-width: 400px;
-      margin-left: auto;
-      margin-right: auto;
       display: none;
     }
 
-    .payment-methods {
-      margin-top: 15px;
-      display: none;
+    .payment-option {
+      margin-top: 10px;
     }
 
-    .payment-methods ul {
-      list-style: none;
-      padding: 0;
-    }
-
-    .payment-methods li {
-      background-color: #eee;
-      padding: 10px;
-      margin: 5px 0;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    .payment-methods li:hover {
-      background-color: #ddd;
+    #receipt {
+      background: #fff;
+      padding: 15px;
+      border: 1px dashed #000;
     }
 
     @media (max-width: 480px) {
       th, td {
-        font-size: 12px;
-        padding: 10px;
+        font-size: 13px;
       }
+
       button {
         width: 100%;
       }
@@ -125,154 +85,168 @@
 </head>
 <body>
 
-<h2>Dashboard User</h2>
+  <h2>Dashboard User</h2>
 
-<input type="text" id="searchInput" placeholder="Cari barang..." oninput="searchItems()" />
+  <input type="text" id="searchInput" placeholder="Cari barang..." oninput="filterTable()">
 
-<div class="table-container">
   <table id="itemTable">
     <thead>
       <tr>
         <th>No</th>
         <th>Nama Barang</th>
         <th>Jumlah</th>
-        <th>Aksi</th>
+        <th>Harga</th>
+        <th>Pilih</th>
       </tr>
     </thead>
-    <tbody><tr><td colspan="4">Memuat data...</td></tr></tbody>
+    <tbody></tbody>
   </table>
-</div>
 
-<div id="cartSummary">
-  <h3>Struk Belanja</h3>
-  <ul id="cartList"></ul>
-  <p><strong>Total: Rp <span id="totalAmount">0</span></strong></p>
-  <button onclick="togglePaymentOptions()">Pilih Metode Pembayaran</button>
+  <h3 id="totalDisplay">Total: Rp0</h3>
 
-  <div class="payment-methods" id="paymentMethods">
-    <h4>Pilih Metode</h4>
-    <ul>
-      <li onclick="selectMethod('Transfer Bank')">Transfer Bank</li>
-      <li onclick="selectMethod('Dana')">Dana</li>
-      <li onclick="selectMethod('OVO')">OVO</li>
-      <li onclick="selectMethod('COD')">Bayar di Tempat</li>
-    </ul>
+  <button onclick="showPayment()">Beli</button>
+
+  <div id="paymentSection">
+    <h3>Metode Pembayaran</h3>
+    <button onclick="selectPayment('Transfer')">Transfer</button>
+    <button onclick="selectPayment('COD')">COD</button>
+
+    <div class="payment-option" id="paymentInput"></div>
+    <button onclick="submitTransaction()">Selesai & Simpan</button>
   </div>
 
-  <div id="paymentForm" style="display:none; margin-top: 20px;"></div>
-</div>
+  <div id="receipt"></div>
 
-<button onclick="logout()">Logout</button>
+  <button onclick="logout()">Logout</button>
 
-<script>
-  let supabase;
-  let dataBarang = [];
-  let cart = [];
-
-  window.addEventListener('DOMContentLoaded', () => {
-    supabase = window.supabase.createClient(
+  <script>
+    const supabase = window.supabase.createClient(
       'https://oluiadcgamtarvxglwvi.supabase.co',
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9sdWlhZGNnYW10YXJ2eGdsd3ZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA5OTc5MDMsImV4cCI6MjA2NjU3MzkwM30.0wAayKThZxfboiKmidQskSRBMmqGJus5wJ1BrxUsPQU'
     );
 
-    const role = localStorage.getItem('sessionRole');
-    if (role !== 'user') window.location.href = 'index.html';
+    let selectedItems = [];
+    let allItems = [];
 
-    loadItems();
-  });
+    async function loadItems() {
+      const { data, error } = await supabase.from('items').select('*');
+      const tbody = document.querySelector('#itemTable tbody');
+      tbody.innerHTML = '';
 
-  async function loadItems() {
-    const { data, error } = await supabase.from('items').select('*');
-    const tbody = document.querySelector('#itemTable tbody');
-    tbody.innerHTML = '';
-
-    if (error || data.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="4">${error ? 'Gagal memuat data.' : 'Tidak ada data.'}</td></tr>`;
-      return;
+      if (data && data.length) {
+        allItems = data;
+        data.forEach((item, i) => {
+          tbody.innerHTML += `
+            <tr>
+              <td>${i + 1}</td>
+              <td>${item.name}</td>
+              <td>${item.qty}</td>
+              <td>Rp${item.price.toLocaleString()}</td>
+              <td><input type="checkbox" onchange="toggleItem(${item.id})"></td>
+            </tr>
+          `;
+        });
+      } else {
+        tbody.innerHTML = '<tr><td colspan="5">Tidak ada data.</td></tr>';
+      }
     }
 
-    dataBarang = data;
-    renderTable(data);
-  }
-
-  function renderTable(data) {
-    const tbody = document.querySelector('#itemTable tbody');
-    tbody.innerHTML = '';
-    data.forEach((item, i) => {
-      tbody.innerHTML += `
-        <tr>
-          <td>${i + 1}</td>
-          <td>${item.name}</td>
-          <td>${item.qty}</td>
-          <td><button onclick="addToCart('${item.name}', ${item.qty}, 10000)">Beli</button></td>
-        </tr>`;
-    });
-  }
-
-  function searchItems() {
-    const q = document.getElementById('searchInput').value.toLowerCase();
-    const hasil = dataBarang.filter(item => item.name.toLowerCase().includes(q));
-    renderTable(hasil);
-  }
-
-  function addToCart(name, qty, price) {
-    cart.push({ name, qty, price });
-    updateCartUI();
-  }
-
-  function updateCartUI() {
-    const list = document.getElementById('cartList');
-    const totalEl = document.getElementById('totalAmount');
-    list.innerHTML = '';
-    let total = 0;
-
-    cart.forEach((item, i) => {
-      total += item.price;
-      list.innerHTML += `<li>${item.name} - Rp ${item.price.toLocaleString()}</li>`;
-    });
-
-    totalEl.textContent = total.toLocaleString();
-    document.getElementById('cartSummary').style.display = 'block';
-  }
-
-  function togglePaymentOptions() {
-    const el = document.getElementById('paymentMethods');
-    el.style.display = el.style.display === 'block' ? 'none' : 'block';
-  }
-
-  function selectMethod(method) {
-    const formDiv = document.getElementById('paymentForm');
-    let html = `<h4>Metode: ${method}</h4>`;
-
-    if (method === 'Transfer Bank') {
-      html += `<label>No Rekening:</label><br><input type="text" placeholder="Masukkan no rekening" />`;
-    } else if (method === 'Dana' || method === 'OVO') {
-      html += `<label>No HP ${method}:</label><br><input type="text" placeholder="08xxxx" />`;
-    } else if (method === 'COD') {
-      html += `<p>Silakan siapkan uang tunai saat barang diterima.</p>`;
+    function toggleItem(id) {
+      const item = allItems.find(x => x.id === id);
+      if (!item) return;
+      const index = selectedItems.findIndex(x => x.id === id);
+      if (index > -1) {
+        selectedItems.splice(index, 1);
+      } else {
+        selectedItems.push(item);
+      }
+      updateTotal();
     }
 
-    html += `<button style="margin-top:10px;" onclick="confirmPayment('${method}')">Konfirmasi Pembayaran</button>`;
-    formDiv.innerHTML = html;
-    formDiv.style.display = 'block';
-  }
+    function updateTotal() {
+      const total = selectedItems.reduce((sum, item) => sum + item.price, 0);
+      document.getElementById('totalDisplay').innerText = `Total: Rp${total.toLocaleString()}`;
+    }
 
-  function confirmPayment(method) {
-    alert(`Pembayaran dengan metode "${method}" dikonfirmasi!\nTerima kasih sudah berbelanja.`);
-    cart = [];
-    updateCartUI();
-    document.getElementById('paymentMethods').style.display = 'none';
-    document.getElementById('paymentForm').style.display = 'none';
-    document.getElementById('cartList').innerHTML = '';
-    document.getElementById('totalAmount').textContent = '0';
-    document.getElementById('cartSummary').style.display = 'none';
-  }
+    function filterTable() {
+      const keyword = document.getElementById('searchInput').value.toLowerCase();
+      const rows = document.querySelectorAll('#itemTable tbody tr');
+      rows.forEach(row => {
+        const name = row.children[1].innerText.toLowerCase();
+        row.style.display = name.includes(keyword) ? '' : 'none';
+      });
+    }
 
-  function logout() {
-    localStorage.clear();
-    window.location.href = 'index.html';
-  }
-</script>
+    function showPayment() {
+      if (selectedItems.length === 0) return alert("Pilih barang dulu.");
+      document.getElementById('paymentSection').style.display = 'block';
+    }
 
+    function selectPayment(method) {
+      let html = '';
+      if (method === 'Transfer') {
+        html = `
+          <label>Nama Rekening:</label><br>
+          <input type="text" id="payInfo" placeholder="Nama pengirim" required><br>
+        `;
+      } else if (method === 'COD') {
+        html = `
+          <label>Alamat Pengiriman:</label><br>
+          <input type="text" id="payInfo" placeholder="Alamat lengkap" required><br>
+        `;
+      }
+      document.getElementById('paymentInput').innerHTML = html;
+      document.getElementById('paymentInput').dataset.method = method;
+    }
+
+    async function submitTransaction() {
+      const method = document.getElementById('paymentInput').dataset.method;
+      const info = document.getElementById('payInfo')?.value.trim();
+
+      if (!method || !info) return alert('Lengkapi metode pembayaran.');
+
+      const timestamp = new Date().toISOString();
+      let total = 0;
+
+      for (const item of selectedItems) {
+        total += item.price;
+        await supabase.from('transactions').insert([{
+          item_name: item.name,
+          qty: 1,
+          price: item.price,
+          payment_method: method,
+          payment_info: info,
+          total,
+          timestamp
+        }]);
+      }
+
+      document.getElementById('receipt').style.display = 'block';
+      document.getElementById('receipt').innerHTML = `
+        <h3>Struk Pembelian</h3>
+        <p>Tanggal: ${new Date().toLocaleString()}</p>
+        <ul>${selectedItems.map(i => `<li>${i.name} - Rp${i.price.toLocaleString()}</li>`).join('')}</ul>
+        <p>Total: <strong>Rp${total.toLocaleString()}</strong></p>
+        <p>Metode: ${method}</p>
+        <p>Keterangan: ${info}</p>
+      `;
+
+      selectedItems = [];
+      loadItems();
+      updateTotal();
+      document.getElementById('paymentSection').style.display = 'none';
+    }
+
+    function logout() {
+      localStorage.clear();
+      window.location.href = 'index.html';
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const role = localStorage.getItem('sessionRole');
+      if (role !== 'user') window.location.href = 'index.html';
+      loadItems();
+    });
+  </script>
 </body>
 </html>
