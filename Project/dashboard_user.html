@@ -82,6 +82,7 @@
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
 
@@ -115,7 +116,15 @@
     <button onclick="submitTransaction()">Selesai & Simpan</button>
   </div>
 
-  <div id="receipt"></div>
+  <div id="receipt">
+    <h3>Struk Pembelian</h3>
+    <p id="tanggal"></p>
+    <ul id="itemList"></ul>
+    <p id="totalTagihan"></p>
+    <p id="metodeBayar"></p>
+    <p id="keteranganBayar"></p>
+    <button onclick="cetakPDF()">Cetak PDF</button>
+  </div>
 
   <button onclick="logout()">Logout</button>
 
@@ -221,20 +230,24 @@
         }]);
       }
 
+      // Generate isi struk
+      document.getElementById('tanggal').innerText = `Tanggal: ${new Date().toLocaleString()}`;
+      document.getElementById('itemList').innerHTML = selectedItems.map(i => `<li>${i.name} - Rp${i.price.toLocaleString()}</li>`).join('');
+      document.getElementById('totalTagihan').innerText = `Total: Rp${total.toLocaleString()}`;
+      document.getElementById('metodeBayar').innerText = `Metode: ${method}`;
+      document.getElementById('keteranganBayar').innerText = `Keterangan: ${info}`;
+
       document.getElementById('receipt').style.display = 'block';
-      document.getElementById('receipt').innerHTML = `
-        <h3>Struk Pembelian</h3>
-        <p>Tanggal: ${new Date().toLocaleString()}</p>
-        <ul>${selectedItems.map(i => `<li>${i.name} - Rp${i.price.toLocaleString()}</li>`).join('')}</ul>
-        <p>Total: <strong>Rp${total.toLocaleString()}</strong></p>
-        <p>Metode: ${method}</p>
-        <p>Keterangan: ${info}</p>
-      `;
 
       selectedItems = [];
       loadItems();
       updateTotal();
       document.getElementById('paymentSection').style.display = 'none';
+    }
+
+    function cetakPDF() {
+      const element = document.getElementById('receipt');
+      html2pdf().from(element).save('struk-pembelian.pdf');
     }
 
     function logout() {
