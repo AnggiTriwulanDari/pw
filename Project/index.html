@@ -6,13 +6,42 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 50px;
       background-color: #f0f8ff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .phone-frame {
+      width: 300px;
+      height: 600px;
+      background-color: #fff;
+      border: 16px solid #ccc;
+      border-radius: 40px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      position: relative;
+      padding: 30px 20px;
+      box-sizing: border-box;
+      text-align: center;
+    }
+
+    .phone-frame::before {
+      content: '';
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 5px;
+      background: #999;
+      border-radius: 3px;
     }
 
     h2 {
       color: #333;
+      font-size: 20px;
+      margin-bottom: 20px;
     }
 
     .button-container {
@@ -29,6 +58,7 @@
       border-radius: 5px;
       color: white;
       transition: background-color 0.3s;
+      width: 100%;
     }
 
     button:hover {
@@ -37,16 +67,8 @@
 
     .form-box {
       display: none;
-      margin-top: 30px;
-      max-width: 400px;
-      margin-left: auto;
-      margin-right: auto;
+      margin-top: 20px;
       text-align: left;
-      background-color: #ffffff;
-      border: 1px solid #ccc;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
 
     input {
@@ -61,53 +83,48 @@
 </head>
 <body>
 
-<h2>Silakan Pilih Login Sebagai:</h2>
+<div class="phone-frame">
+  <h2>Login Sebagai:</h2>
 
-<div class="button-container">
-  <button onclick="showForm('user')">Login User</button>
-  <button onclick="showForm('admin')">Login Admin</button>
-</div>
+  <div class="button-container">
+    <button onclick="showForm('user')">Login User</button>
+    <button onclick="showForm('admin')">Login Admin</button>
+  </div>
 
-<!-- Form Login User -->
-<div id="userForm" class="form-box">
-  <h3>Login User</h3>
-  <form onsubmit="return loginUser(event)">
-    <label>Username:</label>
-    <input type="text" id="userUsername" required>
+  <!-- Form Login User -->
+  <div id="userForm" class="form-box">
+    <h3>Login User</h3>
+    <form onsubmit="return loginUser(event)">
+      <label>Username:</label>
+      <input type="text" id="userUsername" required>
+      <label>Password:</label>
+      <input type="password" id="userPassword" required>
+      <button type="submit">Login</button>
+    </form>
+  </div>
 
-    <label>Password:</label>
-    <input type="password" id="userPassword" required>
-
-    <button type="submit">Login</button>
-  </form>
-</div>
-
-<!-- Form Login Admin -->
-<div id="adminForm" class="form-box">
-  <h3>Login Admin</h3>
-  <form onsubmit="return loginAdmin(event)">
-    <label>Username:</label>
-    <input type="text" id="adminUsername" required>
-
-    <label>Password:</label>
-    <input type="password" id="adminPassword" required>
-
-    <button type="submit">Login</button>
-  </form>
+  <!-- Form Login Admin -->
+  <div id="adminForm" class="form-box">
+    <h3>Login Admin</h3>
+    <form onsubmit="return loginAdmin(event)">
+      <label>Username:</label>
+      <input type="text" id="adminUsername" required>
+      <label>Password:</label>
+      <input type="password" id="adminPassword" required>
+      <button type="submit">Login</button>
+    </form>
+  </div>
 </div>
 
 <script>
-  // Inisialisasi Supabase client di global scope
   const supabase = window.supabase.createClient(
     'https://oluiadcgamtarvxglwvi.supabase.co',
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9sdWlhZGNnYW10YXJ2eGdsd3ZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA5OTc5MDMsImV4cCI6MjA2NjU3MzkwM30.0wAayKThZxfboiKmidQskSRBMmqGJus5wJ1BrxUsPQU' 
   );
 
-  // Fungsi tampilkan form
   function showForm(role) {
     document.getElementById('userForm').style.display = 'none';
     document.getElementById('adminForm').style.display = 'none';
-
     if (role === 'user') {
       document.getElementById('userForm').style.display = 'block';
     } else if (role === 'admin') {
@@ -115,12 +132,10 @@
     }
   }
 
-  // Fungsi login user
   async function loginUser(e) {
     e.preventDefault();
     const uname = document.getElementById('userUsername').value.trim();
     const pass = document.getElementById('userPassword').value.trim();
-
     const { data, error } = await supabase
       .from('users')
       .select('*')
@@ -128,7 +143,6 @@
       .eq('password', pass)
       .eq('role', 'user')
       .single();
-
     if (error || !data) {
       alert('Login user gagal!');
     } else {
@@ -139,12 +153,10 @@
     }
   }
 
-  // Fungsi login admin
   async function loginAdmin(e) {
     e.preventDefault();
     const uname = document.getElementById('adminUsername').value.trim();
     const pass = document.getElementById('adminPassword').value.trim();
-
     const { data, error } = await supabase
       .from('users')
       .select('*')
@@ -152,7 +164,6 @@
       .eq('password', pass)
       .eq('role', 'admin')
       .single();
-
     if (error || !data) {
       alert('Login admin gagal!');
     } else {
