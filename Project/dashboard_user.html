@@ -15,22 +15,19 @@
     }
 
     h2 {
-      text-align: center;
       color: #333;
-    }
-
-    .search-container {
       text-align: center;
-      margin-top: 20px;
+      font-size: 24px;
     }
 
-    .search-container input {
+    input[type="text"] {
       padding: 10px;
-      width: 80%;
-      max-width: 400px;
-      border: 1px solid #ccc;
+      width: 100%;
+      max-width: 300px;
+      margin: 10px auto;
+      display: block;
       border-radius: 5px;
-      font-size: 16px;
+      border: 1px solid #ccc;
     }
 
     .table-container {
@@ -42,13 +39,13 @@
       width: 100%;
       border-collapse: collapse;
       background-color: #fff;
-      min-width: 300px;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      min-width: 300px;
     }
 
     th, td {
       border: 1px solid #ccc;
-      padding: 10px;
+      padding: 12px;
       text-align: center;
       font-size: 14px;
     }
@@ -58,83 +55,67 @@
       color: white;
     }
 
-    .buy-btn {
-      background-color: #32CD32;
-      color: white;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 4px;
+    tr:hover {
+      background-color: #f1f1f1;
       cursor: pointer;
     }
 
-    .buy-btn:hover {
-      background-color: #2aab2a;
-    }
-
-    .button-container {
-      text-align: center;
-      margin: 20px 0;
-    }
-
     button {
-      padding: 12px 20px;
+      padding: 10px 20px;
       font-size: 16px;
-      margin-top: 10px;
+      margin: 10px auto;
       cursor: pointer;
       background-color: #87CEEB;
       border: none;
       border-radius: 5px;
       color: white;
-      transition: 0.3s;
+      transition: background-color 0.3s;
+      display: block;
     }
 
     button:hover {
       background-color: #00bfff;
     }
 
-    .cart-summary {
-      margin-top: 30px;
-      text-align: center;
-    }
-
-    .cart-summary ul {
-      list-style: none;
-      padding: 0;
-      margin-bottom: 10px;
-    }
-
-    .cart-summary li {
-      margin: 5px 0;
+    #cartSummary {
+      background-color: #fff;
+      padding: 15px;
+      margin-top: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+      display: none;
     }
 
     .payment-methods {
+      margin-top: 15px;
       display: none;
-      text-align: center;
-      margin-top: 20px;
-      padding: 15px;
-      background-color: #fff;
-      border: 1px solid #ccc;
-      border-radius: 8px;
+    }
+
+    .payment-methods ul {
+      list-style: none;
+      padding: 0;
     }
 
     .payment-methods li {
+      background-color: #eee;
       padding: 10px;
-      margin: 5px;
-      background: #e0f7ff;
-      border: 1px solid #87CEEB;
-      border-radius: 5px;
+      margin: 5px 0;
+      border-radius: 4px;
       cursor: pointer;
     }
 
     .payment-methods li:hover {
-      background-color: #c0ebff;
+      background-color: #ddd;
     }
 
     @media (max-width: 480px) {
       th, td {
         font-size: 12px;
+        padding: 10px;
       }
-
       button {
         width: 100%;
       }
@@ -144,138 +125,154 @@
 </head>
 <body>
 
-  <h2>Dashboard User</h2>
+<h2>Dashboard User</h2>
 
-  <!-- Search -->
-  <div class="search-container">
-    <input type="text" id="searchInput" placeholder="Cari nama barang..." oninput="filterItems()" />
-  </div>
+<input type="text" id="searchInput" placeholder="Cari barang..." oninput="searchItems()" />
 
-  <!-- Table -->
-  <div class="table-container">
-    <table id="itemTable">
-      <thead>
-        <tr>
-          <th>No</th>
-          <th>Nama</th>
-          <th>Jumlah</th>
-          <th>Harga</th>
-          <th>Aksi</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td colspan="5">Memuat data...</td></tr>
-      </tbody>
-    </table>
-  </div>
+<div class="table-container">
+  <table id="itemTable">
+    <thead>
+      <tr>
+        <th>No</th>
+        <th>Nama Barang</th>
+        <th>Jumlah</th>
+        <th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody><tr><td colspan="4">Memuat data...</td></tr></tbody>
+  </table>
+</div>
 
-  <!-- Cart Summary -->
-  <div class="cart-summary" id="cartSummary" style="display:none;">
-    <h3>Struk Belanja</h3>
-    <ul id="cartList"></ul>
-    <p><strong>Total: Rp <span id="totalAmount">0</span></strong></p>
-  </div>
+<div id="cartSummary">
+  <h3>Struk Belanja</h3>
+  <ul id="cartList"></ul>
+  <p><strong>Total: Rp <span id="totalAmount">0</span></strong></p>
+  <button onclick="togglePaymentOptions()">Pilih Metode Pembayaran</button>
 
-  <!-- Payment Methods -->
   <div class="payment-methods" id="paymentMethods">
-    <h3>Metode Pembayaran</h3>
+    <h4>Pilih Metode</h4>
     <ul>
-      <li onclick="alert('Transfer Bank dipilih')">Transfer Bank</li>
-      <li onclick="alert('Dana dipilih')">Dana</li>
-      <li onclick="alert('OVO dipilih')">OVO</li>
-      <li onclick="alert('COD dipilih')">Bayar di Tempat</li>
+      <li onclick="selectMethod('Transfer Bank')">Transfer Bank</li>
+      <li onclick="selectMethod('Dana')">Dana</li>
+      <li onclick="selectMethod('OVO')">OVO</li>
+      <li onclick="selectMethod('COD')">Bayar di Tempat</li>
     </ul>
   </div>
 
-  <!-- Buttons -->
-  <div class="button-container">
-    <button onclick="showPayment()">Lanjut ke Pembayaran</button>
-    <button onclick="logout()">Logout</button>
-  </div>
+  <div id="paymentForm" style="display:none; margin-top: 20px;"></div>
+</div>
 
-  <script>
-    let supabase;
-    let items = [];
-    let cart = [];
+<button onclick="logout()">Logout</button>
 
-    window.addEventListener('DOMContentLoaded', () => {
-      supabase = window.supabase.createClient(
-        'https://oluiadcgamtarvxglwvi.supabase.co',
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9sdWlhZGNnYW10YXJ2eGdsd3ZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA5OTc5MDMsImV4cCI6MjA2NjU3MzkwM30.0wAayKThZxfboiKmidQskSRBMmqGJus5wJ1BrxUsPQU'
-      );
+<script>
+  let supabase;
+  let dataBarang = [];
+  let cart = [];
 
-      const role = localStorage.getItem('sessionRole');
-      if (role !== 'user') window.location.href = 'index.html';
+  window.addEventListener('DOMContentLoaded', () => {
+    supabase = window.supabase.createClient(
+      'https://oluiadcgamtarvxglwvi.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9sdWlhZGNnYW10YXJ2eGdsd3ZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA5OTc5MDMsImV4cCI6MjA2NjU3MzkwM30.0wAayKThZxfboiKmidQskSRBMmqGJus5wJ1BrxUsPQU'
+    );
 
-      loadItems();
+    const role = localStorage.getItem('sessionRole');
+    if (role !== 'user') window.location.href = 'index.html';
+
+    loadItems();
+  });
+
+  async function loadItems() {
+    const { data, error } = await supabase.from('items').select('*');
+    const tbody = document.querySelector('#itemTable tbody');
+    tbody.innerHTML = '';
+
+    if (error || data.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="4">${error ? 'Gagal memuat data.' : 'Tidak ada data.'}</td></tr>`;
+      return;
+    }
+
+    dataBarang = data;
+    renderTable(data);
+  }
+
+  function renderTable(data) {
+    const tbody = document.querySelector('#itemTable tbody');
+    tbody.innerHTML = '';
+    data.forEach((item, i) => {
+      tbody.innerHTML += `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${item.name}</td>
+          <td>${item.qty}</td>
+          <td><button onclick="addToCart('${item.name}', ${item.qty}, 10000)">Beli</button></td>
+        </tr>`;
+    });
+  }
+
+  function searchItems() {
+    const q = document.getElementById('searchInput').value.toLowerCase();
+    const hasil = dataBarang.filter(item => item.name.toLowerCase().includes(q));
+    renderTable(hasil);
+  }
+
+  function addToCart(name, qty, price) {
+    cart.push({ name, qty, price });
+    updateCartUI();
+  }
+
+  function updateCartUI() {
+    const list = document.getElementById('cartList');
+    const totalEl = document.getElementById('totalAmount');
+    list.innerHTML = '';
+    let total = 0;
+
+    cart.forEach((item, i) => {
+      total += item.price;
+      list.innerHTML += `<li>${item.name} - Rp ${item.price.toLocaleString()}</li>`;
     });
 
-    async function loadItems() {
-      const { data, error } = await supabase.from('items').select('*');
-      const tbody = document.querySelector('#itemTable tbody');
-      tbody.innerHTML = '';
+    totalEl.textContent = total.toLocaleString();
+    document.getElementById('cartSummary').style.display = 'block';
+  }
 
-      if (error) {
-        console.error('Gagal ambil data:', error);
-        tbody.innerHTML = '<tr><td colspan="5">Gagal memuat data.</td></tr>';
-        return;
-      }
+  function togglePaymentOptions() {
+    const el = document.getElementById('paymentMethods');
+    el.style.display = el.style.display === 'block' ? 'none' : 'block';
+  }
 
-      items = data;
-      renderItems(data);
+  function selectMethod(method) {
+    const formDiv = document.getElementById('paymentForm');
+    let html = `<h4>Metode: ${method}</h4>`;
+
+    if (method === 'Transfer Bank') {
+      html += `<label>No Rekening:</label><br><input type="text" placeholder="Masukkan no rekening" />`;
+    } else if (method === 'Dana' || method === 'OVO') {
+      html += `<label>No HP ${method}:</label><br><input type="text" placeholder="08xxxx" />`;
+    } else if (method === 'COD') {
+      html += `<p>Silakan siapkan uang tunai saat barang diterima.</p>`;
     }
 
-    function renderItems(data) {
-      const tbody = document.querySelector('#itemTable tbody');
-      tbody.innerHTML = '';
-      data.forEach((item, i) => {
-        tbody.innerHTML += `
-          <tr>
-            <td>${i + 1}</td>
-            <td>${item.name}</td>
-            <td>${item.qty}</td>
-            <td>Rp ${item.price}</td>
-            <td><button class="buy-btn" onclick="addToCart('${item.name}', ${item.price})">Beli</button></td>
-          </tr>`;
-      });
-    }
+    html += `<button style="margin-top:10px;" onclick="confirmPayment('${method}')">Konfirmasi Pembayaran</button>`;
+    formDiv.innerHTML = html;
+    formDiv.style.display = 'block';
+  }
 
-    function addToCart(name, price) {
-      cart.push({ name, price });
-      updateCart();
-    }
+  function confirmPayment(method) {
+    alert(`Pembayaran dengan metode "${method}" dikonfirmasi!\nTerima kasih sudah berbelanja.`);
+    cart = [];
+    updateCartUI();
+    document.getElementById('paymentMethods').style.display = 'none';
+    document.getElementById('paymentForm').style.display = 'none';
+    document.getElementById('cartList').innerHTML = '';
+    document.getElementById('totalAmount').textContent = '0';
+    document.getElementById('cartSummary').style.display = 'none';
+  }
 
-    function updateCart() {
-      const list = document.getElementById('cartList');
-      const total = document.getElementById('totalAmount');
-      const cartDiv = document.getElementById('cartSummary');
+  function logout() {
+    localStorage.clear();
+    window.location.href = 'index.html';
+  }
+</script>
 
-      list.innerHTML = '';
-      let totalPrice = 0;
-
-      cart.forEach((item, i) => {
-        totalPrice += item.price;
-        list.innerHTML += `<li>${i + 1}. ${item.name} - Rp ${item.price}</li>`;
-      });
-
-      total.textContent = totalPrice;
-      cartDiv.style.display = cart.length > 0 ? 'block' : 'none';
-    }
-
-    function filterItems() {
-      const keyword = document.getElementById('searchInput').value.toLowerCase();
-      const filtered = items.filter(item => item.name.toLowerCase().includes(keyword));
-      renderItems(filtered);
-    }
-
-    function showPayment() {
-      document.getElementById('paymentMethods').style.display = 'block';
-    }
-
-    function logout() {
-      localStorage.clear();
-      window.location.href = 'index.html';
-    }
-  </script>
 </body>
 </html>
