@@ -59,7 +59,6 @@
 
     table {
       width: 100%;
-      max-width: 100%;
       border-collapse: collapse;
       margin-top: 20px;
     }
@@ -105,6 +104,7 @@
     <form id="itemForm">
       <input type="text" id="itemName" placeholder="Nama Barang" required />
       <input type="number" id="itemQty" placeholder="Jumlah" required />
+      <input type="number" id="itemPrice" placeholder="Harga (Rp)" required />
       <div class="button-group">
         <button type="submit">Simpan</button>
         <button type="button" onclick="updateItem()">Edit</button>
@@ -119,6 +119,7 @@
         <th>No</th>
         <th>Nama Barang</th>
         <th>Jumlah</th>
+        <th>Harga</th>
       </tr>
     </thead>
     <tbody></tbody>
@@ -154,38 +155,41 @@
 
       if (error) {
         console.error('Gagal ambil data:', error);
-        tbody.innerHTML = '<tr><td colspan="3">Gagal memuat data.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4">Gagal memuat data.</td></tr>';
         return;
       }
 
       if (data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="3">Tidak ada data.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4">Tidak ada data.</td></tr>';
       } else {
         data.forEach((item, i) => {
           tbody.innerHTML += `
-            <tr onclick="selectItem(${item.id}, '${item.name}', ${item.qty})">
+            <tr onclick="selectItem(${item.id}, '${item.name}', ${item.qty}, ${item.price})">
               <td>${i + 1}</td>
               <td>${item.name}</td>
               <td>${item.qty}</td>
+              <td>Rp${item.price.toLocaleString()}</td>
             </tr>`;
         });
       }
     }
 
-    function selectItem(id, name, qty) {
+    function selectItem(id, name, qty, price) {
       selectedId = id;
       document.getElementById('itemName').value = name;
       document.getElementById('itemQty').value = qty;
+      document.getElementById('itemPrice').value = price;
     }
 
     async function addItem(e) {
       e.preventDefault();
       const name = document.getElementById('itemName').value.trim();
       const qty = parseInt(document.getElementById('itemQty').value.trim());
+      const price = parseInt(document.getElementById('itemPrice').value.trim());
 
-      if (!name || isNaN(qty)) return alert('Input tidak valid');
+      if (!name || isNaN(qty) || isNaN(price)) return alert('Input tidak valid');
 
-      const { error } = await supabase.from('items').insert([{ name, qty }]);
+      const { error } = await supabase.from('items').insert([{ name, qty, price }]);
 
       if (error) {
         alert('Gagal menambahkan data');
@@ -200,10 +204,11 @@
       if (!selectedId) return alert('Klik baris dulu buat edit.');
       const name = document.getElementById('itemName').value.trim();
       const qty = parseInt(document.getElementById('itemQty').value.trim());
+      const price = parseInt(document.getElementById('itemPrice').value.trim());
 
       const { error } = await supabase
         .from('items')
-        .update({ name, qty })
+        .update({ name, qty, price })
         .eq('id', selectedId);
 
       if (error) {
