@@ -2,92 +2,117 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard User</title>
   <style>
-  body {
-    font-family: Arial, sans-serif;
-    text-align: center;
-    padding: 50px;
-    background-color: #f0f8ff;
-  }
+    * {
+      box-sizing: border-box;
+    }
 
-  h2 {
-    color: #333;
-  }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f0f8ff;
+    }
 
-  .button-container {
-    margin-top: 30px;
-  }
+    h2 {
+      color: #333;
+      text-align: center;
+      font-size: 24px;
+    }
 
-  button {
-    padding: 12px 25px;
-    font-size: 16px;
-    margin: 10px;
-    cursor: pointer;
-    background-color: #87CEEB; /* Sky Blue */
-    border: none;
-    border-radius: 5px;
-    color: white;
-    transition: background-color 0.3s;
-  }
+    .button-container {
+      text-align: center;
+      margin-top: 30px;
+    }
 
-  button:hover {
-    background-color: #00bfff; /* Deep Sky Blue */
-  }
+    button {
+      padding: 12px 20px;
+      font-size: 16px;
+      margin: 20px auto 0;
+      cursor: pointer;
+      background-color: #87CEEB;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      transition: background-color 0.3s;
+      display: block;
+    }
 
-  .form-box {
-    display: none;
-    margin-top: 30px;
-    max-width: 400px;
-    margin-left: auto;
-    margin-right: auto;
-    text-align: left;
-    background-color: #ffffff;
-    border: 1px solid #ccc;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  }
+    button:hover {
+      background-color: #00bfff;
+    }
 
-  input {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
+    .table-container {
+      overflow-x: auto;
+      margin-top: 20px;
+    }
 
-  /* Tabel di tengah dan ukuran enak dilihat */
-  table {
-    margin: 30px auto;
-    border-collapse: collapse;
-    width: 80%;
-    background-color: #fff;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: #fff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      min-width: 300px;
+    }
 
-  th, td {
-    border: 1px solid #ccc;
-    padding: 12px;
-    text-align: center;
-  }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 12px;
+      text-align: center;
+      font-size: 14px;
+    }
 
-  th {
-    background-color: #87CEEB;
-    color: white;
-  }
+    th {
+      background-color: #87CEEB;
+      color: white;
+    }
 
-  tr:hover {
-    background-color: #f1f1f1;
-    cursor: pointer;
-  }
-</style>
+    tr:hover {
+      background-color: #f1f1f1;
+      cursor: pointer;
+    }
+
+    @media (max-width: 480px) {
+      h2 {
+        font-size: 20px;
+      }
+
+      th, td {
+        font-size: 12px;
+        padding: 10px;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
 <body>
 
+  <h2>Dashboard User</h2>
+
+  <div class="table-container">
+    <table id="itemTable">
+      <thead>
+        <tr>
+          <th>No</th>
+          <th>Nama Barang</th>
+          <th>Jumlah</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td colspan="3">Memuat data...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <button onclick="logout()">Logout</button>
+
   <script>
-    // Inisialisasi Supabase setelah SDK diload
     let supabase;
     window.addEventListener('DOMContentLoaded', () => {
       supabase = window.supabase.createClient(
@@ -101,7 +126,7 @@
         return;
       }
 
-      loadItems(); // Panggil setelah Supabase siap
+      loadItems();
     });
 
     async function loadItems() {
@@ -134,24 +159,5 @@
       window.location.href = 'index.html';
     }
   </script>
-</head>
-<body>
-  <h2>Dashboard User</h2>
-
-  <table border="1" id="itemTable">
-    <thead>
-      <tr>
-        <th>No</th>
-        <th>Nama Barang</th>
-        <th>Jumlah</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td colspan="3">Memuat data...</td></tr>
-    </tbody>
-  </table>
-
-  <br />
-  <button onclick="logout()">Logout</button>
 </body>
 </html>
