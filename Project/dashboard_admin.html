@@ -78,6 +78,21 @@
       background-color: #e6f7ff;
       cursor: pointer;
     }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 15px;
+      }
+
+      table, th, td {
+        font-size: 14px;
+      }
+
+      button {
+        width: 100%;
+        margin: 8px 0;
+      }
+    }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
@@ -89,9 +104,9 @@
     <form id="itemForm">
       <input type="text" id="itemName" placeholder="Nama Barang" required />
       <input type="number" id="itemQty" placeholder="Jumlah" required />
-      <input type="number" id="itemPrice" placeholder="Harga Per Item (Rp)" required />
+      <input type="number" id="itemPrice" placeholder="Harga Per item(Rp)" required />
       <div class="button-group">
-        <button type="submit">Tambah</button>
+        <button type="submit">Simpan</button>
         <button type="button" onclick="updateItem()">Edit</button>
         <button type="button" onclick="deleteItem()">Hapus</button>
       </div>
@@ -104,40 +119,37 @@
         <th>No</th>
         <th>Nama Barang</th>
         <th>Jumlah</th>
-        <th>Harga</th>
+        <th>Harga Per item</th>
       </tr>
     </thead>
     <tbody></tbody>
   </table>
 
   <br />
-  <button onclick="confirmLogout()">Logout</button>
+  <button onclick="logout()">Logout</button>
 
   <script>
-    // Supabase Client
-    const supabase = supabase.createClient(
-      'https://oluiadcgamtarvxglwvi.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9sdWlhZGNnYW10YXJ2eGdsd3ZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA5OTc5MDMsImV4cCI6MjA2NjU3MzkwM30.0wAayKThZxfboiKmidQskSRBMmqGJus5wJ1BrxUsPQU'
-    );
-
+    let supabase;
     let selectedId = null;
 
     window.addEventListener('DOMContentLoaded', () => {
+      supabase = window.supabase.createClient(
+        'https://oluiadcgamtarvxglwvi.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9sdWlhZGNnYW10YXJ2eGdsd3ZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA5OTc5MDMsImV4cCI6MjA2NjU3MzkwM30.0wAayKThZxfboiKmidQskSRBMmqGJus5wJ1BrxUsPQU'
+      );
+
       const role = localStorage.getItem('sessionRole');
       if (role !== 'admin') {
-        alert('Akses ditolak! Anda bukan admin.');
         window.location.href = 'index.html';
         return;
       }
 
       loadItems();
-
       document.getElementById('itemForm').addEventListener('submit', addItem);
     });
 
     async function loadItems() {
       const { data, error } = await supabase.from('items').select('*');
-
       const tbody = document.querySelector('#itemTable tbody');
       tbody.innerHTML = '';
 
@@ -175,12 +187,12 @@
       const qty = parseInt(document.getElementById('itemQty').value.trim());
       const price = parseInt(document.getElementById('itemPrice').value.trim());
 
-      if (!name || isNaN(qty) || isNaN(price)) return alert('Isi semua kolom dengan benar.');
+      if (!name || isNaN(qty) || isNaN(price)) return alert('Input tidak valid');
 
       const { error } = await supabase.from('items').insert([{ name, qty, price }]);
 
       if (error) {
-        alert('Gagal menambahkan barang!');
+        alert('Gagal menambahkan data');
         console.error(error);
       } else {
         resetForm();
@@ -189,7 +201,7 @@
     }
 
     async function updateItem() {
-      if (!selectedId) return alert('Klik baris dulu untuk edit.');
+      if (!selectedId) return alert('Klik baris dulu buat edit.');
       const name = document.getElementById('itemName').value.trim();
       const qty = parseInt(document.getElementById('itemQty').value.trim());
       const price = parseInt(document.getElementById('itemPrice').value.trim());
@@ -200,7 +212,7 @@
         .eq('id', selectedId);
 
       if (error) {
-        alert('Gagal update data.');
+        alert('Gagal update data');
         console.error(error);
       } else {
         resetForm();
@@ -209,13 +221,16 @@
     }
 
     async function deleteItem() {
-      if (!selectedId) return alert('Klik baris dulu untuk hapus.');
-      if (!confirm('Yakin ingin menghapus barang ini?')) return;
+      if (!selectedId) return alert('Klik baris dulu buat hapus.');
+      if (!confirm('Yakin mau hapus barang ini?')) return;
 
-      const { error } = await supabase.from('items').delete().eq('id', selectedId);
+      const { error } = await supabase
+        .from('items')
+        .delete()
+        .eq('id', selectedId);
 
       if (error) {
-        alert('Gagal hapus data.');
+        alert('Gagal hapus data');
         console.error(error);
       } else {
         resetForm();
@@ -228,8 +243,9 @@
       document.getElementById('itemForm').reset();
     }
 
-    function confirmLogout() {
-      if (confirm('Yakin ingin logout dan meninggalkan halaman ini?')) {
+    function logout() {
+      const confirmLogout = confirm("Yakin ingin logout?");
+      if (confirmLogout) {
         localStorage.clear();
         window.location.href = 'index.html';
       }
