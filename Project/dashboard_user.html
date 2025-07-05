@@ -56,21 +56,6 @@
       background: #00bfff;
     }
 
-    #paymentSection, #receipt {
-      margin-top: 20px;
-      display: none;
-    }
-
-    .payment-option {
-      margin-top: 10px;
-    }
-
-    #receipt {
-      background: #fff;
-      padding: 15px;
-      border: 1px dashed #000;
-    }
-
     @media (max-width: 480px) {
       th, td {
         font-size: 13px;
@@ -82,7 +67,6 @@
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
 
@@ -97,34 +81,10 @@
         <th>Nama Barang</th>
         <th>Jumlah</th>
         <th>Harga</th>
-        <th>Pilih</th>
       </tr>
     </thead>
     <tbody></tbody>
   </table>
-
-  <h3 id="totalDisplay">Total: Rp0</h3>
-
-  <button onclick="showPayment()">Beli</button>
-
-  <div id="paymentSection">
-    <h3>Metode Pembayaran</h3>
-    <button onclick="selectPayment('Transfer')">Transfer</button>
-    <button onclick="selectPayment('COD')">COD</button>
-
-    <div class="payment-option" id="paymentInput"></div>
-    <button onclick="submitTransaction()">Selesai & Simpan</button>
-  </div>
-
-  <div id="receipt">
-    <h3>Struk Pembelian</h3>
-    <p id="tanggal"></p>
-    <ul id="itemList"></ul>
-    <p id="totalTagihan"></p>
-    <p id="metodeBayar"></p>
-    <p id="keteranganBayar"></p>
-    <button onclick="cetakPDF()">Cetak PDF</button>
-  </div>
 
   <button onclick="logout()">Logout</button>
 
@@ -134,16 +94,12 @@
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9sdWlhZGNnYW10YXJ2eGdsd3ZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA5OTc5MDMsImV4cCI6MjA2NjU3MzkwM30.0wAayKThZxfboiKmidQskSRBMmqGJus5wJ1BrxUsPQU'
     );
 
-    let selectedItems = [];
-    let allItems = [];
-
     async function loadItems() {
       const { data, error } = await supabase.from('items').select('*');
       const tbody = document.querySelector('#itemTable tbody');
       tbody.innerHTML = '';
 
       if (data && data.length) {
-        allItems = data;
         data.forEach((item, i) => {
           tbody.innerHTML += `
             <tr>
@@ -151,30 +107,12 @@
               <td>${item.name}</td>
               <td>${item.qty}</td>
               <td>Rp${item.price.toLocaleString()}</td>
-              <td><input type="checkbox" onchange="toggleItem(${item.id})"></td>
             </tr>
           `;
         });
       } else {
-        tbody.innerHTML = '<tr><td colspan="5">Tidak ada data.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4">Tidak ada data.</td></tr>';
       }
-    }
-
-    function toggleItem(id) {
-      const item = allItems.find(x => x.id === id);
-      if (!item) return;
-      const index = selectedItems.findIndex(x => x.id === id);
-      if (index > -1) {
-        selectedItems.splice(index, 1);
-      } else {
-        selectedItems.push(item);
-      }
-      updateTotal();
-    }
-
-    function updateTotal() {
-      const total = selectedItems.reduce((sum, item) => sum + item.price, 0);
-      document.getElementById('totalDisplay').innerText = `Total: Rp${total.toLocaleString()}`;
     }
 
     function filterTable() {
@@ -184,70 +122,6 @@
         const name = row.children[1].innerText.toLowerCase();
         row.style.display = name.includes(keyword) ? '' : 'none';
       });
-    }
-
-    function showPayment() {
-      if (selectedItems.length === 0) return alert("Pilih barang dulu.");
-      document.getElementById('paymentSection').style.display = 'block';
-    }
-
-    function selectPayment(method) {
-      let html = '';
-      if (method === 'Transfer') {
-        html = `
-          <label>Nama Rekening:</label><br>
-          <input type="text" id="payInfo" placeholder="Nama pengirim" required><br>
-        `;
-      } else if (method === 'COD') {
-        html = `
-          <label>Alamat Pengiriman:</label><br>
-          <input type="text" id="payInfo" placeholder="Alamat lengkap" required><br>
-        `;
-      }
-      document.getElementById('paymentInput').innerHTML = html;
-      document.getElementById('paymentInput').dataset.method = method;
-    }
-
-    async function submitTransaction() {
-      const method = document.getElementById('paymentInput').dataset.method;
-      const info = document.getElementById('payInfo')?.value.trim();
-
-      if (!method || !info) return alert('Lengkapi metode pembayaran.');
-
-      const timestamp = new Date().toISOString();
-      let total = 0;
-
-      for (const item of selectedItems) {
-        total += item.price;
-        await supabase.from('transactions').insert([{
-          item_name: item.name,
-          qty: 1,
-          price: item.price,
-          payment_method: method,
-          payment_info: info,
-          total,
-          timestamp
-        }]);
-      }
-
-      // Generate isi struk
-      document.getElementById('tanggal').innerText = `Tanggal: ${new Date().toLocaleString()}`;
-      document.getElementById('itemList').innerHTML = selectedItems.map(i => `<li>${i.name} - Rp${i.price.toLocaleString()}</li>`).join('');
-      document.getElementById('totalTagihan').innerText = `Total: Rp${total.toLocaleString()}`;
-      document.getElementById('metodeBayar').innerText = `Metode: ${method}`;
-      document.getElementById('keteranganBayar').innerText = `Keterangan: ${info}`;
-
-      document.getElementById('receipt').style.display = 'block';
-
-      selectedItems = [];
-      loadItems();
-      updateTotal();
-      document.getElementById('paymentSection').style.display = 'none';
-    }
-
-    function cetakPDF() {
-      const element = document.getElementById('receipt');
-      html2pdf().from(element).save('struk-pembelian.pdf');
     }
 
     function logout() {
