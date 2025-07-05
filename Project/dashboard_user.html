@@ -58,7 +58,6 @@
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
   <h2>Dashboard User</h2>
@@ -77,12 +76,12 @@
     <tbody></tbody>
   </table>
 
-  <button onclick="confirmLogout()">Logout</button>
+  <button onclick="logout()">Logout</button>
 
   <script>
     const supabase = window.supabase.createClient(
       'https://oluiadcgamtarvxglwvi.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9sdWlhZGNnYW10YXJ2eGdsd3ZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA5OTc5MDMsImV4cCI6MjA2NjU3MzkwM30.0wAayKThZxfboiKmidQskSRBMmqGJus5wJ1BrxUsPQU'
+      'YOUR_NEW_ANON_KEY'
     );
 
     window.addEventListener('DOMContentLoaded', () => {
@@ -91,14 +90,6 @@
         window.location.href = 'index.html';
         return;
       }
-
-      Swal.fire({
-        title: `Selamat Datang 👋`,
-        text: `Halo ${localStorage.getItem('sessionUser')}, Anda login sebagai User.`,
-        icon: 'success',
-        confirmButtonText: 'Lanjut'
-      });
-
       loadItems();
     });
 
@@ -137,31 +128,11 @@
       });
     }
 
-    function confirmLogout() {
-      Swal.fire({
-        title: 'Yakin ingin logout?',
-        text: "Kamu akan keluar dari aplikasi.",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, Logout',
-        cancelButtonText: 'No'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          Swal.fire({
-            title: 'Sampai jumpa lagi!',
-            text: 'Terima kasih sudah menggunakan aplikasi.',
-            icon: 'success',
-            timer: 2000,
-            showConfirmButton: false
-          });
-          localStorage.clear();
-          setTimeout(() => {
-            window.location.href = 'index.html';
-          }, 2000);
-        }
-      });
+    function logout() {
+      if (confirm('Yakin ingin logout?')) {
+        localStorage.clear();
+        window.location.href = 'index.html';
+      }
     }
   </script>
 </body>
