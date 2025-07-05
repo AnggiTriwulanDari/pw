@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Halaman Login Pilih Role</title>
   <style>
     * { box-sizing: border-box; }
@@ -57,6 +57,7 @@
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
 
@@ -74,9 +75,9 @@
       <h3>Login User</h3>
       <form onsubmit="return loginUser(event)">
         <label>Username:</label>
-        <input type="text" id="userUsername" required>
+        <input type="text" id="userUsername" required />
         <label>Password:</label>
-        <input type="password" id="userPassword" required>
+        <input type="password" id="userPassword" required />
         <button type="submit">Login</button>
       </form>
     </div>
@@ -85,9 +86,9 @@
       <h3>Login Admin</h3>
       <form onsubmit="return loginAdmin(event)">
         <label>Username:</label>
-        <input type="text" id="adminUsername" required>
+        <input type="text" id="adminUsername" required />
         <label>Password:</label>
-        <input type="password" id="adminPassword" required>
+        <input type="password" id="adminPassword" required />
         <button type="submit">Login</button>
       </form>
     </div>
@@ -100,20 +101,11 @@
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9sdWlhZGNnYW10YXJ2eGdsd3ZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA5OTc5MDMsImV4cCI6MjA2NjU3MzkwM30.0wAayKThZxfboiKmidQskSRBMmqGJus5wJ1BrxUsPQU'
   );
 
-  // ✅ Cek kalau sudah login, redirect langsung
-  window.addEventListener('DOMContentLoaded', () => {
-    const role = localStorage.getItem('sessionRole');
-    if (role === 'user') {
-      window.location.href = 'dashboard_user.html';
-    } else if (role === 'admin') {
-      window.location.href = 'dashboard_admin.html';
-    }
-  });
-
   function showForm(role) {
     document.getElementById('roleSelection').style.display = 'none';
     document.getElementById('userForm').style.display = 'none';
     document.getElementById('adminForm').style.display = 'none';
+
     if (role === 'user') {
       document.getElementById('userForm').style.display = 'block';
     } else if (role === 'admin') {
@@ -133,12 +125,20 @@
       .eq('role', 'user')
       .single();
     if (error || !data) {
-      alert('Login user gagal!');
+      Swal.fire('Login Gagal', 'Username atau password salah.', 'error');
     } else {
-      alert('Login user berhasil!');
+      Swal.fire({
+        icon: 'success',
+        title: `Selamat datang, ${uname}!`,
+        text: 'Halo User, selamat datang di aplikasi kami.',
+        timer: 2000,
+        showConfirmButton: false
+      });
       localStorage.setItem('sessionUser', uname);
       localStorage.setItem('sessionRole', 'user');
-      window.location.href = 'dashboard_user.html';
+      setTimeout(() => {
+        window.location.href = 'dashboard_user.html';
+      }, 2000);
     }
   }
 
@@ -154,15 +154,22 @@
       .eq('role', 'admin')
       .single();
     if (error || !data) {
-      alert('Login admin gagal!');
+      Swal.fire('Login Gagal', 'Username atau password salah.', 'error');
     } else {
-      alert('Login admin berhasil!');
+      Swal.fire({
+        icon: 'success',
+        title: `Selamat datang, ${uname}!`,
+        text: 'Halo Admin, selamat datang di aplikasi kami.',
+        timer: 2000,
+        showConfirmButton: false
+      });
       localStorage.setItem('sessionUser', uname);
       localStorage.setItem('sessionRole', 'admin');
-      window.location.href = 'dashboard_admin.html';
+      setTimeout(() => {
+        window.location.href = 'dashboard_admin.html';
+      }, 2000);
     }
   }
 </script>
-
 </body>
 </html>
