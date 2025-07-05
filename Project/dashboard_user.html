@@ -55,38 +55,6 @@
     button:hover {
       background: #00bfff;
     }
-
-    /* Modal Styles */
-    #logoutModal {
-      display: none;
-      position: fixed;
-      z-index: 999;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-    }
-
-    #logoutModal .modal-content {
-      background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      text-align: center;
-      width: 300px;
-      margin: 15% auto;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-    }
-
-    #logoutModal .modal-content p {
-      margin-bottom: 20px;
-      font-size: 16px;
-    }
-
-    #logoutModal .modal-content button {
-      margin: 5px;
-      width: 100px;
-    }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
@@ -102,22 +70,13 @@
         <th>No</th>
         <th>Nama Barang</th>
         <th>Jumlah</th>
-        <th>Harga</th>
+        <th>Harga Per item</th>
       </tr>
     </thead>
     <tbody></tbody>
   </table>
 
-  <button onclick="showLogoutModal()">Logout</button>
-
-  <!-- Modal Konfirmasi Logout -->
-  <div id="logoutModal">
-    <div class="modal-content">
-      <p>Yakin ingin logout?</p>
-      <button onclick="confirmLogout()">Ya</button>
-      <button onclick="closeModal()">Batal</button>
-    </div>
-  </div>
+  <button onclick="logout()">Logout</button>
 
   <script>
     const supabase = window.supabase.createClient(
@@ -158,17 +117,16 @@
       });
     }
 
-    function showLogoutModal() {
-      document.getElementById('logoutModal').style.display = 'block';
-    }
-
-    function closeModal() {
-      document.getElementById('logoutModal').style.display = 'none';
-    }
-
-    function confirmLogout() {
-      localStorage.clear();
-      window.location.href = 'index.html';
+    async function logout() {
+      const confirmLogout = confirm("Yakin ingin meninggalkan halaman ini?");
+      if (confirmLogout) {
+        await supabase.auth.signOut();
+        localStorage.clear();
+        window.location.href = 'index.html';
+      } else {
+        // User klik “No”, tetap stay di halaman
+        return;
+      }
     }
 
     window.addEventListener('DOMContentLoaded', () => {
