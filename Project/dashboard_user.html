@@ -7,134 +7,65 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 20px;
+      text-align: center;
+      padding: 30px;
       background-color: #f0f8ff;
     }
-
-    h2 {
-      text-align: center;
-    }
-
-    #searchInput {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 10px;
-      box-sizing: border-box;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: #fff;
-      margin-top: 10px;
-    }
-
-    th, td {
-      padding: 10px;
-      border: 1px solid #ccc;
-      text-align: center;
-    }
-
-    th {
-      background-color: #87CEEB;
-      color: white;
-    }
-
+    h2 { color: #333; }
     button {
-      margin-top: 20px;
       padding: 10px 20px;
-      background: #87CEEB;
+      margin-top: 20px;
+      background-color: #87CEEB;
+      color: #fff;
       border: none;
-      color: white;
-      cursor: pointer;
       border-radius: 5px;
-      font-size: 16px;
+      cursor: pointer;
     }
-
     button:hover {
-      background: #00bfff;
+      background-color: #00bfff;
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
+  <h2>Selamat Datang di Dashboard User</h2>
+  <p>Ini halaman untuk user.</p>
 
-  <h2>Dashboard User</h2>
-
-  <input type="text" id="searchInput" placeholder="Cari barang..." oninput="filterTable()">
-
-  <table id="itemTable">
-    <thead>
-      <tr>
-        <th>No</th>
-        <th>Nama Barang</th>
-        <th>Jumlah</th>
-        <th>Harga Per item</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-
-  <button onclick="logout()">Logout</button>
+  <button onclick="confirmLogout()">Logout</button>
 
   <script>
     const supabase = window.supabase.createClient(
       'https://oluiadcgamtarvxglwvi.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9sdWlhZGNnYW10YXJ2eGdsd3ZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA5OTc5MDMsImV4cCI6MjA2NjU3MzkwM30.0wAayKThZxfboiKmidQskSRBMmqGJus5wJ1BrxUsPQU'
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
     );
 
-    let allItems = [];
-
-    async function loadItems() {
-      const { data, error } = await supabase.from('items').select('*');
-      const tbody = document.querySelector('#itemTable tbody');
-      tbody.innerHTML = '';
-
-      if (data && data.length) {
-        allItems = data;
-        data.forEach((item, i) => {
-          tbody.innerHTML += `
-            <tr>
-              <td>${i + 1}</td>
-              <td>${item.name}</td>
-              <td>${item.qty}</td>
-              <td>Rp${item.price.toLocaleString()}</td>
-            </tr>
-          `;
-        });
-      } else {
-        tbody.innerHTML = '<tr><td colspan="4">Tidak ada data.</td></tr>';
-      }
-    }
-
-    function filterTable() {
-      const keyword = document.getElementById('searchInput').value.toLowerCase();
-      const rows = document.querySelectorAll('#itemTable tbody tr');
-      rows.forEach(row => {
-        const name = row.children[1].innerText.toLowerCase();
-        row.style.display = name.includes(keyword) ? '' : 'none';
+    function confirmLogout() {
+      Swal.fire({
+        title: 'Yakin ingin logout?',
+        text: "Kamu akan keluar dari aplikasi.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, Logout',
+        cancelButtonText: 'No'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          Swal.fire({
+            title: 'Sampai jumpa lagi!',
+            text: 'Terima kasih sudah menggunakan aplikasi.',
+            icon: 'success',
+            timer: 2000,
+            showConfirmButton: false
+          });
+          localStorage.clear();
+          setTimeout(() => {
+            window.location.href = 'index.html';
+          }, 2000);
+        }
       });
     }
-
-    async function logout() {
-      const confirmLogout = confirm("Yakin ingin meninggalkan halaman ini?");
-      if (confirmLogout) {
-        await supabase.auth.signOut();
-        localStorage.clear();
-        window.location.href = 'index.html';
-      } else {
-        // User klik “No”, tetap stay di halaman
-        return;
-      }
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      const role = localStorage.getItem('sessionRole');
-      if (role !== 'user') window.location.href = 'index.html';
-      loadItems();
-    });
   </script>
-
 </body>
 </html>
