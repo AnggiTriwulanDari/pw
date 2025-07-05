@@ -131,7 +131,7 @@
   <script>
     const supabase = window.supabase.createClient(
       'https://oluiadcgamtarvxglwvi.supabase.co',
-      'YOUR_NEW_ANON_KEY'
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9sdWlhZGNnYW10YXJ2eGdsd3ZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA5OTc5MDMsImV4cCI6MjA2NjU3MzkwM30.0wAayKThZxfboiKmidQskSRBMmqGJus5wJ1BrxUsPQU'
     );
 
     let selectedId = null;
@@ -142,10 +142,6 @@
         window.location.href = 'index.html';
         return;
       }
-
-      // ✅ Selamat datang admin
-      const username = localStorage.getItem('sessionUser');
-      alert(`Selamat Datang, ${username}! Anda login sebagai Admin.`);
 
       loadItems();
       document.getElementById('itemForm').addEventListener('submit', addItem);
