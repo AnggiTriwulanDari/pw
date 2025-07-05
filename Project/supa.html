@@ -1,96 +1,119 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Aplikasi Inventory</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 50px;
+      margin: 0;
       background-color: #f0f8ff;
     }
 
-    h2 {
+    .header-bg {
+      width: 100%;
+      height: 250px;
+      background: url('background.jpg') no-repeat center center/cover;
+      position: relative;
+    }
+
+    .profile-photo-wrapper {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 5px solid white;
+      position: absolute;
+      bottom: -75px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #fff;
+    }
+
+    .profile-photo {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .header-text {
+      text-align: center;
+      margin-top: 90px;
+    }
+
+    .header-text h1 {
+      margin: 10px 0 5px 0;
       color: #333;
     }
 
-    .button-container {
-      margin-top: 30px;
+    .subtitle {
+      color: #555;
+      font-size: 16px;
     }
 
-    button {
-      padding: 12px 25px;
+    .action-buttons {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .action-buttons button {
+      padding: 10px 20px;
       font-size: 16px;
-      margin: 10px;
-      cursor: pointer;
-      background-color: #87CEEB; /* Sky Blue */
+      margin: 5px;
+      background-color: #87CEEB;
       border: none;
       border-radius: 5px;
       color: white;
+      cursor: pointer;
       transition: background-color 0.3s;
     }
 
-    button:hover {
-      background-color: #00bfff; /* Deep Sky Blue */
+    .action-buttons button:hover {
+      background-color: #00bfff;
     }
 
-    .form-box {
-      display: none;
-      margin-top: 30px;
-      max-width: 400px;
-      margin-left: auto;
-      margin-right: auto;
-      text-align: left;
-      background-color: #ffffff;
-      border: 1px solid #ccc;
-      padding: 20px;
+    .content-card {
+      background-color: #fff;
       border-radius: 8px;
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      margin: 20px auto;
+      max-width: 600px;
+      padding: 20px;
     }
 
-    input {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+    .content-card h3 {
+      margin-top: 0;
+      color: #333;
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
 <body>
-<div class="profile-container">
+
   <div class="header-bg"></div>
 
   <div class="profile-photo-wrapper">
-    <img src="eduhtml.png" alt="profile" class="profile-photo" />
+    <img src="eduhtml.png" alt="Profile" class="profile-photo" />
   </div>
 
   <div class="header-text">
     <h1>Aplikasi Inventory</h1>
-    <p class="subtitle">He/Him • Mahasiswa</p>
-    <p>Jakarta, Indonesia • <a href="https://Aplikasi.Inventory.com">Aplikasi.Inventory.com</a></p>
-    <p><strong>Berkah Selalu</strong> — Universitas IPWIJA</p>
+    <p class="subtitle">Mahasiswa Universitas IPWIJA</p>
+    <p>Jakarta, Indonesia • <a href="#">Aplikasi.Inventory.com</a></p>
   </div>
 
   <div class="action-buttons">
-
-    <button id="loginBtn">Login untuk akses data</button>
-<button id="logoutBtn">Logout</button>
-
+    <button id="loginBtn">Login</button>
+    <button id="logoutBtn">Logout</button>
   </div>
 
   <div id="content"></div>
 
   <div class="content-card">
     <h3>Sosial Media</h3>
-    <ul>
-      <li><strong>github :</strong> http://github.com/in/AnggiTriwulanDari</li>
-    </ul>
+    <p><strong>GitHub:</strong> <a href="https://github.com/in/AnggiTriwulanDari">github.com/in/AnggiTriwulanDari</a></p>
   </div>
-</div>
 
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
@@ -101,11 +124,11 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 const content = document.getElementById('content')
 
-// Coba login manual (bisa diganti pakai form)
+// Coba login
 async function login() {
   const { data, error } = await supabase.auth.signInWithPassword({
-    email: 'user@gmail.com', // ganti dengan akun terdaftar
-    password: 'user123'     // ganti sesuai user
+    email: 'user@gmail.com',
+    password: 'user123'
   })
 
   if (error) {
@@ -121,38 +144,26 @@ async function logout() {
   content.innerHTML = '<p>Logout berhasil.</p>'
 }
 
-// Load data hanya milik user yang login
 async function loadData() {
-  const {
-    data: { user }
-  } = await supabase.auth.getUser()
-
+  const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
-
     content.innerHTML = '<p>Silakan login untuk melihat data.</p>'
     return
   }
 
-  const { data, error } = await supabase
-    .from('items')
-    .select('*')
-    .order('id')
-
+  const { data, error } = await supabase.from('items').select('*')
   if (error) {
     alert('Error loading data: ' + error.message)
     return
   }
 
-  let out = ''
+  let out = '<h3>Data Barang</h3>'
   data.forEach(row => {
-    out += `
-      <div class="content-card">
-        <h2>${row.name}</h2>
-        <p>${row.qty}</p>
-      </div>
-    `
+    out += `<div class="content-card">
+              <h4>${row.name}</h4>
+              <p>Jumlah: ${row.qty}</p>
+            </div>`
   })
-
   content.innerHTML = out
 }
 
@@ -164,6 +175,5 @@ window.addEventListener('DOMContentLoaded', async () => {
   if (user) loadData()
 })
 </script>
-
 </body>
 </html>
