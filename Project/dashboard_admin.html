@@ -104,7 +104,7 @@
     <form id="itemForm">
       <input type="text" id="itemName" placeholder="Nama Barang" required />
       <input type="number" id="itemQty" placeholder="Jumlah" required />
-      <input type="number" id="itemPrice" placeholder="Harga Per item(Rp)" required />
+      <input type="number" id="itemPrice" placeholder="Harga Per item" required />
       <div class="button-group">
         <button type="submit">Simpan</button>
         <button type="button" onclick="updateItem()">Edit</button>
@@ -244,8 +244,11 @@
     }
 
     function logout() {
-      localStorage.clear();
-      window.location.href = 'index.html';
+      const confirmLogout = confirm("Yakin ingin logout?");
+      if (confirmLogout) {
+        localStorage.clear();
+        window.location.href = 'index.html';
+      }
     }
   </script>
 </body>
